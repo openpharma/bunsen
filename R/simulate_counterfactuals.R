@@ -1,5 +1,6 @@
-simulate_counterfactuals=function(bh,surv_cond,M=M,cpp=TRUE){
+simulate_counterfactuals=function(bh,surv_cond,M,cpp,loadcpp=TRUE){
   if(cpp){
+    if(loadcpp) sourceCpp('cpp_functions.cpp')
     newd= rbinom_matrix_vec(nrows=nrow(bh), ncols=M, surv_cond)
     index_event_d = firstZeroIndex(newd)
 

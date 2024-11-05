@@ -6,8 +6,6 @@ calculate_statistics=function(model,data,type,trt,bh){
   if(type==1) dt[trt]=1
   if(type==0) dt[trt]=0
 
-
-
   pred=predict(model,newdata = dt,type='risk',reference = 'zero')
   survf=exp(-pred%*%t(bh$hazard))
 

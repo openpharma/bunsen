@@ -8,6 +8,8 @@ fx.clsmq.cpp=function(i){
 
   cox_censor_tmp <- update(cox_censor,data=tmp.dt)
 
-  hr_tmp <- get_marginal_effect(trt,cox_event=cox_event_tmp, cox_censor = cox_censor_tmp, data=tmp.dt, M=M,boot.SE=FALSE)
+  hr_tmp <- get_point_estimate(trt=trt,cox_event = cox_event_tmp,cox_censor = cox_censor_tmp,data=tmp.dt,M=M,seed=seed,cpp=cpp,
+                               memory=memory,local=local,clmq=clmq)
   return(hr_tmp)
 }
+

@@ -1,21 +1,22 @@
-get_variance_estimation=function(fx.clsmq.cpp,cox_event,cox_censor,M,data,n.boot,n_jobs,memory = 1024*24
+get_variance_estimation=function(trt,data,M,n.boot,n_jobs,memory=1024*32,cpp=TRUE,local=TRUE,clmq=TRUE,seed=NULL,local_cores=1,local_memory=1024*16
 ){
-
+  if(is.null(seed)) seed=Sys.time()
   cat(paste0('Calculating SE in clustermq using bootstrap N = ',n.boot,'...\n'))
 
-  out=Q(fun = fx.clsmq.cpp,i=1:n.boot,n_jobs = n_jobs,memory = memory,
-        export = list(data=data,
-                      trt='trt',
-                      cox_event=cox_event,
-                      cox_censor=cox_censor,
-                      M=M,cpp=cpp,
-                      get_marginal_effect=get_marginal_effect,
-                      calculate_statistics=calculate_statistics,
-                      get_point_estimate=get_point_estimate,
-                      simulate_counterfactuals=simulate_counterfactuals,
-                      boot.SE=FALSE
+  options(clustermq.scheduler="LSF")
 
-        ),pkgs = c('survival','Rcpp','mirai'))
+
+  out=Q(fun = fx.clsmq.cpp,i=1:n.boot,n_jobs = n_jobs,memory = memory,seed=seed,
+        export = list(data=data,memory = local_memory,
+                      cox_event=cox_event,cox_censor=cox_censor,
+                      trt=trt,local=local,clmq=clmq,
+                      M=M,cpp=cpp,seed=seed,
+                      get_point_estimate=get_point_estimate,
+                      calculate_statistics=calculate_statistics,
+                      calculate_trt_effect=calculate_trt_effect,
+                      simulate_counterfactuals=simulate_counterfactuals,
+                      fx_clsmq_simcoun=fx_clsmq_simcoun
+        ),template = list(cores = local_cores),pkgs = c('survival','Rcpp','clustermq'))
   hr_se=do.call(c,out)
   se=sd(hr_se)
   lb=quantile(hr_se, prob=.025)
@@ -24,16 +25,3 @@ get_variance_estimation=function(fx.clsmq.cpp,cox_event,cox_censor,M,data,n.boot
 }
 
 
-fx.clsmq.cpp=function(i){
-
-  tmp <- sample(1:nrow(data), size=nrow(data), replace=TRUE)
-
-  tmp.dt <- data[tmp, ]
-
-  cox_event_tmp <- update(cox_event,data=tmp.dt)
-
-  cox_censor_tmp <- update(cox_censor,data=tmp.dt)
-
-  hr_tmp <- get_marginal_effect(trt,cox_event=cox_event_tmp, cox_censor = cox_censor_tmp, data=tmp.dt, M=M,boot.SE=FALSE)
-  return(hr_tmp)
-}
