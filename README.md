@@ -1,18 +1,26 @@
-# bunsen: Robust Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials
+# bunsen: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials
 
-The bunsen package aims to provide a robust and easy-to-use interface for estimating marginal or unconditional Hazard Ratio (HR) and Restricted Mean Survival Time (RMST) when adjusting prognostic covariates in clinical trials.
+The **bunsen** package aims to provide an easy-to-use interface for estimating **marginal or unconditional Hazard Ratio (HR) and Restricted Mean Survival Time (RMST)** when adjusting prognostic covariates in clinical trials.
 
-## Methodology
+## Key features
 
-bunsen is developed based on three key papers:
+We introduce **bunsen** package for marginal HR and RMST estimation and variance for time-to-event endpoints in clinical trials. We included multiple features in current package:
 
--   HR: [Rhian Daniel et al. (2020)](https://onlinelibrary.wiley.com/doi/10.1002/bimj.201900297)
--   RMST: [Theodore Karrison et al. (2018)](https://journals.sagepub.com/doi/10.1177/1740774518759281)
--   Extension of above two methods: [Jiawei Wei et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19466315.2023.2292774)
+-   Marginal HR estimation
+    -   Rcpp (C++) optimization
+    -   ClusterMQ parallel computation
+        -   Local multiprocess and multicores parallel computation for point estimate *(suggested)*
+        -   LSF parallel computation for point estimate
+        -   LSF and/or nested local multiprocess parallel computation for variance *(suggested)*
+-   RMST estimation
 
 ## Example
 
+### Marginal point estimate and variance of HR for COX model
+
 ``` r
+library(bunsen)
+
 data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
@@ -33,6 +41,14 @@ get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak)
 # -0.4631677  0.1047327 -0.6667394 -0.2504570 
 ```
 
+## Methodology
+
+bunsen is developed based on three key papers:
+
+-   HR: [Rhian Daniel et al. (2020)](https://onlinelibrary.wiley.com/doi/10.1002/bimj.201900297)
+-   RMST: [Theodore Karrison et al. (2018)](https://journals.sagepub.com/doi/10.1177/1740774518759281)
+-   Extension of above two methods: [Jiawei Wei et al. (2024)](https://www.tandfonline.com/doi/full/10.1080/19466315.2023.2292774)
+
 ## Package authors
 
 -   Xinlei Deng (Maintainer)
@@ -45,5 +61,3 @@ get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak)
 
 -   Jiawei Wei
 -   Lukas Andreas Widmer
-
-## References
