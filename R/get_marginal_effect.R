@@ -7,7 +7,7 @@ get_marginal_effect=function(trt, cox_event, cox_censor, data, M, SE=TRUE, seed=
 
   if(SE){
     SE=get_variance_estimation(trt,data,M,n.boot,n_jobs,memory,cpp,local=local_se,clmq=clmq_se,seed,local_cores,local_memory)
-    output=c(HR=output,SE)
+    output=c(beta=output,SE)
   }
 
   return(output)

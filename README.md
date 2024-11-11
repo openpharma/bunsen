@@ -32,15 +32,31 @@ get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak)
 # Calculating point estimate in local clustermq using multiprocess...
 # Starting 4 processes ...
 # Running 4 calculations (12 objs/71.2 Kb common; 1 calls/chunk) ...
-# Master: [12.2 secs 1.6% CPU]; Worker: [avg 18.6% CPU, max 305.1 Mb]                                                                                                          
+# Master: [11.2 secs 1.3% CPU]; Worker: [avg 17.3% CPU, max 305.1 Mb]                                                                           
 # Calculating SE in clustermq using bootstrap N = 1000...
-# Submitting 100 worker jobs (ID: cmq6349) ...
-# Running 1,000 calculations (23 objs/255.6 Kb common; 1 calls/chunk) ...
-# Master: [19.8 secs 7.8% CPU]; Worker: [avg 36.7% CPU, max 308 Mb]                                                                                                            
-#         HR         se       2.5%      97.5% 
-# -0.4631677  0.1047327 -0.6667394 -0.2504570 
+# Submitting 100 worker jobs (ID: cmq8170) ...
+# Running 1,000 calculations (23 objs/218 Kb common; 1 calls/chunk) ...
+# Master: [16.4 secs 9.5% CPU]; Worker: [avg 45.3% CPU, max 307.6 Mb]                                                                           
+#       beta         se       2.5%      97.5% 
+# -0.4502997  0.1041306 -0.6675942 -0.2524910 
+
 ```
 
+### Marginal point estimate and variance of RMST for COX model
+
+``` r
+library(bunsen)
+
+data('oak')
+
+tau=26
+
+fit <- coxph(Surv(OS, os.status) ~ btmb+pdl1+strata(trt), data=oak)
+
+get_rmst_estimate(fit,data=oak,tau=26)
+
+# [1] 3.265971
+```
 ## Methodology
 
 bunsen is developed based on three key papers:
