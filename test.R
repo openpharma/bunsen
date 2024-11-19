@@ -1,4 +1,5 @@
 library(survival)
+library(boot)
 data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
@@ -17,7 +18,10 @@ tau=26
 
 fit <- coxph(Surv(OS, os.status) ~ btmb+pdl1+strata(trt), data=oak)
 
-get_rmst_estimate(fit,data=oak,tau=26)
+get_rmst_est(fit=fit,data=oak,tau=tau)
+
+set.seed(960159)
+get_rmst_var(fit=fit,data=oak,tau=tau,type = 'boot',n.boot = 1000)
 
 
-use_r('get_rmst_variance')
+

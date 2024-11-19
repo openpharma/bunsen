@@ -56,6 +56,14 @@ fit <- coxph(Surv(OS, os.status) ~ btmb+pdl1+strata(trt), data=oak)
 get_rmst_estimate(fit,data=oak,tau=26)
 
 # [1] 3.265971
+
+set.seed(960159)
+
+get_rmst_var(fit=fit,data=oak,tau=tau,type = 'boot',n.boot = 1000)
+
+#        SE      2.5%     97.5% 
+# 0.7321543 1.8608879 4.7185839
+
 ```
 ## Methodology
 

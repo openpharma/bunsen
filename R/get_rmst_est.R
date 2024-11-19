@@ -1,5 +1,7 @@
 
-get_rmst_estimate=function(fit,data,tau){
+get_rmst_est=function(data,fit,tau){
+
+  # if(usedata) fit=update(fit,data=data)
 
   cumhaz=basehaz(fit,centered = FALSE)
 
