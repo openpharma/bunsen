@@ -1,7 +1,7 @@
 
 calculate_statistics=function(model,data,type,trt,bh){
 
-  dt=model.frame(model,data)[names(coefficients(model))]
+  dt=model.frame(model,data)
 
   if(type==1) dt[trt]=1
   if(type==0) dt[trt]=0

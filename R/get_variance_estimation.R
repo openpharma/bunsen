@@ -1,4 +1,5 @@
-get_variance_estimation=function(trt,data,M,n.boot,n_jobs,memory=1024*32,cpp=TRUE,local=TRUE,clmq=TRUE,seed=NULL,local_cores=1,local_memory=1024*16
+get_variance_estimation=function(trt,data,M,n.boot,n_jobs,memory=1024*32,cpp=TRUE,local=TRUE,clmq=TRUE,
+                                 seed=NULL,local_cores=1,local_memory=1024*16
 ){
   if(is.null(seed)) seed=Sys.time()
   cat(paste0('Calculating SE in clustermq using bootstrap N = ',n.boot,'...\n'))
