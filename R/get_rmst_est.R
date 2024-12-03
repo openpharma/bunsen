@@ -7,23 +7,24 @@ get_rmst_est=function(time, status, arm, covariates,tau,SE='delta',n.boot=1000){
   }else{
     covariates=as.data.frame(covariates)
 
-    data=as.data.frame(cbind(time,status, arm, covariates))
+    dt=as.data.frame(cbind(time,status, arm, covariates))
 
-    fit=coxph(as.formula(paste0('Surv(time, status) ~ ',paste(names(covariates),collapse = '+'),'+strata(arm)')),data = data)
+    fit=coxph(as.formula(paste0('Surv(time, status) ~ ',paste(names(covariates),collapse = '+'),'+strata(arm)')),data = dt)
 
-    delta=rmst_point_estimate(fit,tau)
+    delta=rmst_point_estimate(fit,dt=dt,tau)
 
     output=delta$output
 
     if(SE=='boot'){
 
-      out=boot(data=data,rmst_boot_fx,R=n.boot,fit=fit,tau=tau)
+      out=boot(data=dt,rmst_boot_fx,R=n.boot,fit=fit,tau=tau)
 
       se=sd(out$t,na.rm = T)
       lb=quantile(out$t, prob=.025,na.rm=T)
       ub=quantile(out$t, prob=.975,na.rm=T)
 
-      out=list(c(SE=se,lb,ub),t=out$t)
+      # out=list(c(SE=se,lb,ub),t=out$t)
+      out=c(SE=se,lb,ub)
 
     }else if(SE=='delta') {
 
@@ -38,7 +39,7 @@ get_rmst_est=function(time, status, arm, covariates,tau,SE='delta',n.boot=1000){
 
 }
 
-rmst_point_estimate=function(fit,tau){
+rmst_point_estimate=function(fit,dt,tau){
 
   cumhaz=basehaz(fit,centered = FALSE)
 
@@ -48,7 +49,7 @@ rmst_point_estimate=function(fit,tau){
 
   cumhaz1 <- cumhaz[cumhaz$strata==grp[2] & cumhaz$time<=tau, ]
 
-  pred=predict(fit,type='risk',reference = 'zero')
+  pred=predict(fit,newdata=dt,type='risk',reference = 'zero')
 
   surv0=exp(-pred%*%t(cumhaz0$hazard))
   surv0_mean= apply(surv0, 2, mean)

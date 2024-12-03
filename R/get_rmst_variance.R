@@ -3,13 +3,14 @@
 rmst_boot_fx=function(data,idx,fit,tau){
 
   fit_tmp <- update(fit,data=data[idx,])
-  tmax=basehaz(fit)
+  tmax=basehaz(fit_tmp)
   tmax0=max(tmax$time[tmax$strata==unique(tmax$strata)[1]])
   tmax1=max(tmax$time[tmax$strata==unique(tmax$strata)[2]])
   if(tmax0<tau |tmax1<tau) {
     output=NA
   }else{
-    output=rmst_point_estimate(fit=fit_tmp,tau)
+    out=rmst_point_estimate(fit=fit_tmp,dt=data[idx,],tau=tau)
+    output=out$output
   }
   return(output)
 }
