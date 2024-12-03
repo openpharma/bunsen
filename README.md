@@ -53,17 +53,15 @@ tau=26
 
 fit <- coxph(Surv(OS, os.status) ~ btmb+pdl1+strata(trt), data=oak)
 
-get_rmst_estimate(fit,data=oak,tau=26)
 
+get_rmst_est(time=oak$OS, status=oak$os.status, arm=oak$trt, covariates=cbind(oak$btmb, oak$pdl1), tau=tau,SE='delta')
+
+# $RMST
 # [1] 3.265971
-
-set.seed(960159)
-
-get_rmst_var(fit=fit,data=oak,tau=tau,type = 'boot',n.boot = 1000)
-
-#        SE      2.5%     97.5% 
-# 0.7321543 1.8608879 4.7185839
-
+# 
+# $SE
+#         se0      se1     se_d
+# 1 0.4645697 0.546053 0.716351
 ```
 ## Methodology
 
