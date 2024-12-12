@@ -1,3 +1,13 @@
+
+# package setup -----------------------------------------------------------
+library(usethis)
+use_news_md()
+
+
+
+# test code ---------------------------------------------------------------
+
+
 library(survival)
 library(boot)
 library(clustermq)
@@ -14,15 +24,23 @@ cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=FALSE,M=10000,data=oak,seed = 1)
 
 
+data('oak')
 
 tau=26
+
 time=oak$OS
+
 status=oak$os.status
+
 arm=oak$trt
+
 covariates=oak[,c('btmb','pdl1')]
 
 get_rmst_est(time, status, arm, covariates,tau,SE='delta')
 
+set.seed(2024)
 
-get_rmst_est(time, status, arm, covariates,tau,SE='boot',n.boot = 100)
+get_rmst_est(time, status, arm, covariates,tau,SE='boot',n.boot = 1000)
+
+
 

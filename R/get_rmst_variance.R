@@ -1,6 +1,6 @@
 
 
-rmst_boot_fx=function(data,idx,fit,tau){
+rmst_boot_fx=function(data,idx,fit,tau,covariates){
 
   fit_tmp <- update(fit,data=data[idx,])
   tmax=basehaz(fit_tmp)
@@ -193,7 +193,7 @@ rmst_delta=function(fit,time, arm, covariates,tau,surv0,surv1,cumhaz0,cumhaz1){
   var_d <- as.numeric(omga_c/n0 + omga_t/n1 + (phi_t-phi_c)%*%sigma%*%(phi_t-phi_c)/fit$n + cov_tc/fit$n)
 
 
-  return(data.frame(se0=se_c, se1=se_t, se_d=sqrt(var_d)))
+  return(sqrt(var_d))
 
 
 }

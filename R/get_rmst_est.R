@@ -17,7 +17,7 @@ get_rmst_est=function(time, status, arm, covariates,tau,SE='delta',n.boot=1000){
 
     if(SE=='boot'){
 
-      out=boot(data=dt,rmst_boot_fx,R=n.boot,fit=fit,tau=tau)
+      out=boot(data=dt,rmst_boot_fx,R=n.boot,fit=fit,tau=tau,covariates=covariates)
 
       se=sd(out$t,na.rm = T)
       lb=quantile(out$t, prob=.025,na.rm=T)
@@ -29,6 +29,7 @@ get_rmst_est=function(time, status, arm, covariates,tau,SE='delta',n.boot=1000){
     }else if(SE=='delta') {
 
       out=rmst_delta(fit,time, arm, covariates,tau,surv0=delta$surv0,surv1=delta$surv1,cumhaz0=delta$cumhaz0,cumhaz1=delta$cumhaz1)
+      out=c(SE=out,`2.5%`=output-1.96*out,`97.5%`=output+1.96*out)
 
     }
 
