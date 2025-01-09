@@ -1,3 +1,49 @@
+#'Calculate the marginal treatment effect using counterfactual simulations
+#'@description
+#'This function is used to calculate the logHR using cox model after obtaining the counterfactural simulations for potential outcomes from \link[bunsen]{simulate_counterfactuals}.
+#'@details
+#'The event indicator from this function uses the equation 10', I(Y0<Y0_cens) or I(Y1<Y1_cens).
+#'
+#'@param sim_out_1d List. A list from \link[bunsen]{simulate_counterfactuals} for cox_event in treatment group, e.g. the cox model using OS.
+#'@param sim_out_0d List. A list from \link[bunsen]{simulate_counterfactuals} for cox_event in control group, e.g. the cox model using OS.
+#'@param sim_out_1c List. A list from \link[bunsen]{simulate_counterfactuals} for cox_event in treatment group, e.g. the cox model using 1-OS.
+#'@param sim_out_0c List. A list from \link[bunsen]{simulate_counterfactuals} for cox_event in control group, e.g. the cox model using 1-OS.
+#'
+#'@return The marginal beta (logHR)
+#'
+#'@references
+#'Daniel R, Zhang J, Farewell D. Making apples from oranges:
+#'Comparing noncollapsible effect estimators and their standard errors
+#'after adjustment for different covariate sets.
+#'Biom J. 2021;63(3):528-557. doi:10.1002/bimj.201900297
+#'@export
+#'@importFrom survival coxph
+#'@examples
+#'library(survival)
+#'data('oak')
+#'
+#'cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
+#
+#'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
+#'bh <- basehaz(cox_event, centered = FALSE)
+#'bh_c <- basehaz(cox_censor, centered = FALSE)
+
+#'s1_condi=calculate_statistics(model=cox_event,data=oak,type=1,trt='trt',bh=bh)
+#'s0_condi=calculate_statistics(model=cox_event,data=oak,type=0,trt='trt',bh=bh)
+
+#'s1_condi_c=calculate_statistics(model=cox_censor,data=oak,type=1,trt='trt',bh=bh_c)
+#'s0_condi_c=calculate_statistics(model=cox_censor,data=oak,type=0,trt='trt',bh=bh_c)
+
+#'sim_out_1d=simulate_counterfactuals(bh=bh,surv_cond = s1_condi,cpp=FALSE,M=1000)
+#'sim_out_0d=simulate_counterfactuals(bh=bh,surv_cond = s0_condi,cpp=FALSE,M=1000)
+#'sim_out_1c=simulate_counterfactuals(bh=bh_c,surv_cond = s1_condi_c,cpp=FALSE,M=1000)
+#'sim_out_0c=simulate_counterfactuals(bh=bh_c,surv_cond = s0_condi_c,cpp=FALSE,M=1000)
+#'
+#'output=calculate_trt_effect(sim_out_1d,sim_out_0d,sim_out_1c,sim_out_0c)
+#'
+
+
+
 calculate_trt_effect=function(sim_out_1d,sim_out_0d,sim_out_1c,sim_out_0c){
     event1=data.frame(eventtime1_c=sim_out_1c$eventtime,
                       eventtime1_d=sim_out_1d$eventtime,

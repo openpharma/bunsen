@@ -1,18 +1,53 @@
 Package: bunsen
 Title: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials
-Version: 0.0.0.9000
+Version: 1.0.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+  c(person(given = "Xinlei", 
+           family = "Deng", 
+           email = "xinlei.deng@novartis.com", 
+           role = c("cre", "aut"), 
+           comment = c(ORCID = "0000-0001-8129-6007")
+           ),
+    person(given = "Mark", 
+           family = "Baillie", 
+           email = "mark.baillie@novartis.com", 
+           role = c("aut"), 
+           comment = c(ORCID = "0000-0002-5618-0667")
+           ),
+    person(given = "Craig", 
+           family = "Wang", 
+           email = "craig.wang@novartis.com", 
+           role = c("aut"),
+           comment = c(ORCID = "0000-0003-1804-2463")
+           ),
+    person(given = "Dominic", 
+           family = "Magirr", 
+           email = "dominic.magirr@novartis.com", 
+           role = c("aut")
+           ),
+    person(given = "Alex", 
+           family = "Przybylski", 
+           email = "alexander.przybylski@novartis.com", 
+           role = c("aut")
+           ))
+Description: A lightweight package aims to provide an easy-to-use interface for estimating marginal or unconditional Hazard Ratio (HR) and 
+  Restricted Mean Survival Time (RMST) when adjusting prognostic covariates in clinical trials.
+Maintainer: Xinlei Deng <xinlei.deng@novartis.com>
 License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
     license
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)
 LazyData: true
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp
+Imports: 
+    clustermq,
+    Rcpp,
+    boot,
+    survival

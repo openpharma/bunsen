@@ -1,8 +1,22 @@
-sanitize_coxmodel = function(object, ...) {
+#' Check the coxph model fit and model specifications.
+#'
+#' Check the coxph model fit including model class and covariates.
+#' See if the model is supported for estimating the marginal treatment effects.
+#'
+#'@param model A coxph model from survival package.
+#'@param ... Parameters for other methods.
+
+
+sanitize_coxmodel = function(model, ...) {
   UseMethod("sanitize_coxmodel")
 }
 
-
+#' Check if the model is supported.
+#'
+#' At the moment, only coxph is supported for the time-to-event endpoints.
+#'
+#'@param model A coxph model from survival package.
+#'@param ... Parameters for other methods.
 
 sanitize_coxmodel.default <- function(model,...) {
   if (!inherits(model, "coxph")) {
@@ -12,6 +26,13 @@ sanitize_coxmodel.default <- function(model,...) {
 
 }
 
+
+#' Check if the coxph model is correctly specified.
+#'
+#' Check the covariates of the coxph model.
+#'
+#'@param model A coxph model from survival package.
+#'@param trt Character. Name of the treatment assignment variable.
 
 sanitize_coxmodel.coxph=function(model,trt){
 
@@ -25,7 +46,7 @@ sanitize_coxmodel.coxph=function(model,trt){
 
   # check trt-covariate interactions
 
-  if(grepl(trt, attr(model$terms,'term.labels')[attr(model$terms,'order')>1])) stop("treatment-covariate interaction is not supported at the moment.", call. = FALSE)
+  if(isTRUE(grepl(trt, attr(model$terms,'term.labels')[attr(model$terms,'order')>1]))) stop("treatment-covariate interaction is not supported at the moment.", call. = FALSE)
 
 
 
