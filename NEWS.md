@@ -1,4 +1,4 @@
 # bunsen (development version)
 
-* Initial CRAN submission. 
-* Package new release
+## New Features 1.0.0
+- First release

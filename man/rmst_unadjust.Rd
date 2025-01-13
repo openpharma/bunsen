@@ -14,8 +14,6 @@ rmst_unadjust(time, status, arm, tau)
 \item{arm}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
 
 \item{tau}{Numeric. A value for the restricted time or the pre-specified cutoff time point.}
-
-\item{covariates}{A data frame containing the covariates. If covariates is NULL, unadjusted RMST is returned.}
 }
 \value{
 A data frame including the survival time for each arm and the difference. SE were also calculated.

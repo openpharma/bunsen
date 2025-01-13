@@ -76,12 +76,15 @@ the computation time. Hence, we introduced C++ optimization and parallel computa
 computation via LSF and remote parallel computation with local multiprocess.
 }
 \examples{
+\dontrun{
 library(survival)
 data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
-get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=TRUE,M=1000,data=oak,seed = 1)
+get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=TRUE,
+M=1000,n.boot=10,n_jobs=10,data=oak,seed = 1,cpp=FALSE)
+}
 }
 \references{
 Daniel R, Zhang J, Farewell D. Making apples from oranges:

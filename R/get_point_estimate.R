@@ -39,7 +39,8 @@
 #
 #'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 #
-#'get_point_estimate(trt = 'trt',cox_event=cox_event,cox_censor,M=1000,data=oak,seed = 1)
+#'get_point_estimate(trt = 'trt',cox_event=cox_event,cox_censor,M=1000,data=oak,
+#'seed = 1,cpp=FALSE,clmq=FALSE)
 
 
 
@@ -66,17 +67,17 @@ get_point_estimate=function(trt,cox_event,cox_censor,data,M=1000,seed=NULL,cpp=T
     if(local) options(clustermq.scheduler="multiprocess")
     cat('Calculating point estimate in local clustermq using multiprocess...\n')
 
-    sim_dt=Q(.fx_clsmq_simcoun, i_bh=c(1,1,2,2), j_surv_cond=1:4,M=M,cpp=cpp, n_jobs=4,memory = memory,seed=seed,
-             export = list(bh_all=bh_all,
-                           s_all=s_all,
-                           cpp=cpp,
-                           M=M,
-                           simulate_counterfactuals=simulate_counterfactuals),template = list(cores = local_cores),pkgs = c('survival','Rcpp'))
+    sim_dt=Q(.fx_clsmq_simcoun, i_bh=c(1,1,2,2), j_surv_cond=1:4,
+             const=list(M=M,cpp=cpp,bh_all=bh_all,
+                        s_all=s_all),
+             n_jobs=4,memory = memory,seed=seed,
+             export = list(
+            simulate_counterfactuals=simulate_counterfactuals),template = list(cores = local_cores),pkgs = c('survival','Rcpp'))
 
     output=calculate_trt_effect(sim_out_1d =sim_dt[[1]] ,sim_out_0d = sim_dt[[2]],sim_out_1c =sim_dt[[3]] ,sim_out_0c = sim_dt[[4]])
 
   }else{
-    sourceCpp('cpp_functions.cpp')
+    if(cpp) sourceCpp('./src/cpp_functions.cpp')
     sim_out_1d=simulate_counterfactuals(bh=bh,surv_cond = s1_condi,cpp=cpp,M=M,loadcpp=FALSE)
     sim_out_0d=simulate_counterfactuals(bh=bh,surv_cond = s0_condi,cpp=cpp,M=M,loadcpp=FALSE)
     sim_out_1c=simulate_counterfactuals(bh=bh_c,surv_cond = s1_condi_c,cpp=cpp,M=M,loadcpp=FALSE)
@@ -89,7 +90,7 @@ get_point_estimate=function(trt,cox_event,cox_censor,data,M=1000,seed=NULL,cpp=T
 }
 
 
-.fx_clsmq_simcoun=function(i_bh,j_surv_cond,M,cpp){
+.fx_clsmq_simcoun=function(i_bh,j_surv_cond,M,cpp,bh_all,s_all){
   out=simulate_counterfactuals(bh=bh_all[[i_bh]],surv_cond = s_all[[j_surv_cond]],cpp=cpp,M=M)
   out['bh']=i_bh
   out['surv_cond']=j_surv_cond

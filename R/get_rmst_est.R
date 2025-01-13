@@ -26,7 +26,7 @@
 #'-  Chen, P. and Tsiatis, A. (2001), “Causal Inference on the Difference of the Restricted Mean Lifetime Between Two Groups,” Biometrics; 57: 1030–1038. DOI: 10.1111/j.0006-341x.2001.01030.x.
 #'@export
 #'
-#'@importFrom survival coxph
+#'@importFrom survival coxph Surv strata
 #'@importFrom boot boot
 #'@examples
 #'

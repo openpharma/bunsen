@@ -33,8 +33,7 @@ Authors@R:
 Description: A lightweight package aims to provide an easy-to-use interface for estimating marginal or unconditional Hazard Ratio (HR) and 
   Restricted Mean Survival Time (RMST) when adjusting prognostic covariates in clinical trials.
 Maintainer: Xinlei Deng <xinlei.deng@novartis.com>
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.1

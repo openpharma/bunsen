@@ -58,7 +58,8 @@ data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
-get_point_estimate(trt = 'trt',cox_event=cox_event,cox_censor,M=1000,data=oak,seed = 1)
+get_point_estimate(trt = 'trt',cox_event=cox_event,cox_censor,M=1000,data=oak,
+seed = 1,cpp=FALSE,clmq=FALSE)
 }
 \references{
 Daniel R, Zhang J, Farewell D. Making apples from oranges:

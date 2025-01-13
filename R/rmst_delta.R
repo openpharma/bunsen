@@ -40,7 +40,8 @@
 #'dt=as.data.frame(cbind(time,status, arm, covariates))
 #'fit=coxph(Surv(time, status) ~ btmb+pdl1+strata(arm),data = dt)
 #'delta=rmst_point_estimate(fit,dt=dt,tau)
-#'rmst_delta(fit,time, arm, covariates,tau,surv0=delta$surv0,surv1=delta$surv1,cumhaz0=delta$cumhaz0,cumhaz1=delta$cumhaz1)
+#'rmst_delta(fit,time, arm, covariates,tau,surv0=delta$surv0,surv1=delta$surv1,
+#'cumhaz0=delta$cumhaz0,cumhaz1=delta$cumhaz1)
 
 
 

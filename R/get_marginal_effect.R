@@ -43,6 +43,7 @@
 #'@export
 #'
 #'@examples
+#'\dontrun{
 #'library(survival)
 #'data('oak')
 #'
@@ -50,7 +51,12 @@
 #
 #'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 #
-#'get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=TRUE,M=1000,data=oak,seed = 1)
+#'get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=TRUE,
+#'M=1000,n.boot=10,n_jobs=10,data=oak,seed = 1,cpp=FALSE)
+#}
+#'}
+
+
 
 
 
@@ -64,11 +70,12 @@ get_marginal_effect=function(trt, cox_event, cox_censor, data, M, SE=TRUE, seed=
   sanitize_coxmodel(cox_censor,trt)
 
 
-  output=get_point_estimate(trt,cox_event,cox_censor,data,M,seed,cpp,
+  output=get_point_estimate(trt=trt,cox_event=cox_event,cox_censor=cox_censor,data=data,M=M,seed=seed,cpp=cpp,
                         memory=memory,local=clmq_local,clmq=clmq_hr)
 
   if(SE){
-    SE=get_variance_estimation(trt,data,M,n.boot,n_jobs,cpp,local=local_se,clmq=clmq_se,seed,local_cores,memory=memory)
+    SE=get_variance_estimation(trt=trt,data=data,M=M,n.boot=n.boot,n_jobs=n_jobs,cox_event=cox_event,cox_censor=cox_censor,
+                               cpp=cpp,local=local_se,clmq=clmq_se,seed=seed,local_cores=local_cores,memory=memory)
     output=c(beta=output,SE)
   }
 

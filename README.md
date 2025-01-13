@@ -14,9 +14,6 @@ We introduce **bunsen** package for marginal HR and RMST estimation and variance
         -   LSF and/or nested local multiprocess parallel computation for variance *(suggested)*
 -   RMST estimation
 
-### Marginal HR estimation framework
-![](Marginal HR framework.png)
-
 ## Example
 
 ### Marginal point estimate and variance of HR for COX model

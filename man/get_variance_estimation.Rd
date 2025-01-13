@@ -5,6 +5,8 @@
 \title{Calculate the variance (SE) of the marginal treatment effects (hazard ratio) adjusting covariates in clinical trials}
 \usage{
 get_variance_estimation(
+  cox_event,
+  cox_censor,
   trt,
   data,
   M,
@@ -19,11 +21,19 @@ get_variance_estimation(
 )
 }
 \arguments{
+\item{cox_event}{Object. A coxph model using the survival time and survival status.}
+
+\item{cox_censor}{Object. A coxph model using the survival time and 1-survival status.}
+
 \item{trt}{Character. Variable name of the treatment assignment. Only support two arm trial at the moment.}
 
 \item{data}{A data frame used for cox_event and cox_censor.}
 
 \item{M}{Numeric. The number of simulated counterfactual patients. Suggest to set above 1,000,000 to get robust estimation but it is time comsuming,}
+
+\item{n.boot}{Numeric. Number of bootstrap.}
+
+\item{n_jobs}{Numeric. Number of remote workers.}
 
 \item{memory}{Numeric. Memory allocation for the remote workers.}
 
@@ -51,13 +61,15 @@ If clustermq is not available, we suggest building your own bootstrap like boot 
 This can also get you the SE or variance estimates. If you only run this function, you need to have cox_censor and cox_event in the environment.
 }
 \examples{
+\dontrun{
 library(survival)
 data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
-get_variance_estimation(trt='trt',data=oak,M=1000,n.boot=100,n_jobs=100)
-
+get_variance_estimation(cox_event,cox_censor,trt='trt',data=oak,
+M=1000,n.boot=10,n_jobs=10,cpp=FALSE)
+}
 }
 \references{
 Daniel R, Zhang J, Farewell D. Making apples from oranges:
