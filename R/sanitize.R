@@ -19,7 +19,7 @@ sanitize_coxmodel <- function(model, ...) {
 #' @param ... Parameters for other methods.
 #' @keywords internal
 #' @export
-sanitize_coxmodel.default <- function(model,...) {
+sanitize_coxmodel.default <- function(model, ...) {
   if (!inherits(model, "coxph")) {
     msg <- c(sprintf('model of class "%s" is not supported and please use coxph instead.', class(model)[1]))
     stop(msg, call. = FALSE)
@@ -36,7 +36,7 @@ sanitize_coxmodel.default <- function(model,...) {
 #' @param trt Character. Name of the treatment assignment variable.
 #' @keywords internal
 #' @export
-sanitize_coxmodel.coxph <- function(model,trt){
+sanitize_coxmodel.coxph <- function(model, trt, ...){
 
   # check strata
 

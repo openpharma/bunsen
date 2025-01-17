@@ -4,7 +4,7 @@
 \alias{sanitize_coxmodel.coxph}
 \title{Check if the coxph model is correctly specified.}
 \usage{
-\method{sanitize_coxmodel}{coxph}(model, trt)
+\method{sanitize_coxmodel}{coxph}(model, trt, ...)
 }
 \arguments{
 \item{model}{A coxph model from survival package.}
