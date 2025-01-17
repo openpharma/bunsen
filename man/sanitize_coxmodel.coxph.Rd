@@ -14,3 +14,4 @@
 \description{
 Check the covariates of the coxph model.
 }
+\keyword{internal}

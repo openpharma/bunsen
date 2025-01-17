@@ -3,11 +3,11 @@
 #' Check the coxph model fit including model class and covariates.
 #' See if the model is supported for estimating the marginal treatment effects.
 #'
-#'@param model A coxph model from survival package.
-#'@param ... Parameters for other methods.
-
-
-sanitize_coxmodel = function(model, ...) {
+#' @param model A coxph model from survival package.
+#' @param ... Parameters for other methods.
+#' @keywords internal
+#' @export
+sanitize_coxmodel <- function(model, ...) {
   UseMethod("sanitize_coxmodel")
 }
 
@@ -15,9 +15,10 @@ sanitize_coxmodel = function(model, ...) {
 #'
 #' At the moment, only coxph is supported for the time-to-event endpoints.
 #'
-#'@param model A coxph model from survival package.
-#'@param ... Parameters for other methods.
-
+#' @param model A coxph model from survival package.
+#' @param ... Parameters for other methods.
+#' @keywords internal
+#' @export
 sanitize_coxmodel.default <- function(model,...) {
   if (!inherits(model, "coxph")) {
     msg <- c(sprintf('model of class "%s" is not supported and please use coxph instead.', class(model)[1]))
@@ -31,10 +32,11 @@ sanitize_coxmodel.default <- function(model,...) {
 #'
 #' Check the covariates of the coxph model.
 #'
-#'@param model A coxph model from survival package.
-#'@param trt Character. Name of the treatment assignment variable.
-
-sanitize_coxmodel.coxph=function(model,trt){
+#' @param model A coxph model from survival package.
+#' @param trt Character. Name of the treatment assignment variable.
+#' @keywords internal
+#' @export
+sanitize_coxmodel.coxph <- function(model,trt){
 
   # check strata
 

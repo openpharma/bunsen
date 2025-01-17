@@ -14,3 +14,4 @@
 \description{
 At the moment, only coxph is supported for the time-to-event endpoints.
 }
+\keyword{internal}
