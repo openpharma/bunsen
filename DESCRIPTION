@@ -1,6 +1,6 @@
 Package: bunsen
 Title: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials
-Version: 1.0.0
+Version: 0.1.0
 Authors@R: 
   c(person(given = "Xinlei", 
            family = "Deng", 
@@ -30,8 +30,9 @@ Authors@R:
            email = "alexander.przybylski@novartis.com", 
            role = c("aut")
            ))
-Description: A lightweight package aims to provide an easy-to-use interface for estimating marginal or unconditional Hazard Ratio (HR) and 
-  Restricted Mean Survival Time (RMST) when adjusting prognostic covariates in clinical trials.
+Description: Provides an efficient and robust implementation for estimating marginal Hazard Ratio (HR) and 
+  Restricted Mean Survival Time (RMST) with covariate adjustment using Daniel et al (2021) <https://doi.org/10.1002/bimj.201900297> and 
+  Karrison et al (2018) <https://doi.org/10.1177/1740774518759281>.
 Maintainer: Xinlei Deng <xinlei.deng@novartis.com>
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -46,7 +47,9 @@ Config/testthat/edition: 3
 LinkingTo: 
     Rcpp
 Imports: 
-    clustermq,
-    Rcpp,
+    stats,
+    survival,
     boot,
-    survival
+    clustermq,
+    Rcpp
+    
