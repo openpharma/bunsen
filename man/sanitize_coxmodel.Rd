@@ -15,3 +15,4 @@ sanitize_coxmodel(model, ...)
 Check the coxph model fit including model class and covariates.
 See if the model is supported for estimating the marginal treatment effects.
 }
+\keyword{internal}
