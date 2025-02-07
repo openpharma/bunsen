@@ -6,8 +6,7 @@
 #'
 #'@details
 #'Restricted mean survival time is a measure of average survival time up to a specified time point. We adopted the methods from Karrison et al.(2018) for
-#'estimating the marginal RMST when adjusting covariates. For the SE, both nonparametric bootstrap and delta method are good for estimation.
-#'We used the delta estimation from Zucker (1998) but we also included an additional variance component which treats the covariates as random as described in Chen and Tsiatis (2001).
+#'estimating the marginal RMST when adjusting covariates. For the SE, both nonparametric bootstrap and delta method are good for estimation. For the delta estimation of variance,we used a combined estimation including Zucker (1998) and Chen and Tsiatis (2001). SE (delta) = variance from Zucker (1998) + additional variance component from Chen and Tsiatis (2001).The additional variance is coming from treating covariates as random.
 #'
 #'@param time A vector containing the event time of the sample.
 #'@param status A vector containing the survival status of the sample.
@@ -41,6 +40,9 @@
 
 
 get_rmst_est=function(time, status, arm, covariates=NULL,tau,SE='delta',n.boot=1000){
+  tau_max=min(max(time[arm==0]),max(time[arm==1]))
+  if(tau>tau_max) stop(sprintf(c("The maximum tau of current sampe is ",round(tau_max,3),". Please choose a reasonable tau.")), call. = FALSE)
+  if(tau<=0) stop(sprintf(c("Tau should be greater than 0!")), call. = FALSE)
 
   if(is.null(covariates)){
 

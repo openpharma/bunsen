@@ -42,6 +42,8 @@
 
 calculate_statistics=function(model,data,type,trt,bh){
 
+  sanitize_coxmodel(model,trt)
+
   dt=model.frame(model,data)
 
   if(type==1) dt[trt]=1
