@@ -3,7 +3,7 @@
 #'@description
 #'Use the simulation approach from Daniel et al. (2020) to estimate the marginal HR when adjusting covariates.
 #'Standard error of marginal HR was estimated via the nonparametric bootstrap.
-#'The standard error of HR will converge with the increase of bootstrap. We suggest setting M = 1,000,000
+#'The standard error of HR will converge with the increase of bootstrap. We suggest setting a large M
 #'for a more robust estimation. This function uses the parallel computation via remote LSF and local multiprocess. Additional
 #'feature also includes the C++ optimization that can speed up the calculation.
 #'
@@ -19,19 +19,13 @@
 #'@param cox_event Object. A coxph model using the survival time and survival status.
 #'@param cox_censor Object. A coxph model using the survival time and 1-survival status.
 #'@param data A data frame used for cox_event and cox_censor.
-#'@param M Numeric. The number of simulated counterfactual patients. Suggest to set above 1,000,000 to get robust estimation but it is time comsuming,
+#'@param M Numeric. The number of simulated counterfactual patients. Suggest to set a large number to get robust results, but this will be very time comsuming.
 #'@param SE Bool. True for estimating SE. False for not estimating SE.
 #'@param seed Numeric. Random seed for simulation.
 #'@param cpp Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.
-#'@param memory Numeric. Memory allocation for the remote workers.
-#'@param local_se Bool. True for calculating SE using local multiprocess in remote workers. This is only useful when clmq_se = TRUE.
-#'@param clmq_se Bool. True for using parallel computation via clustermq. This can be combined with local_se to calculate SE with nested parallel computation and
-#'local multiprocess. False for calculating SE in remote workers without nested parallel computation and local multiprocess.
-#'@param clmq_hr Bool. True for calculating point estimate (marginal HR) using parallel computation via clustermq.
-#'@param clmq_local Bool. True for calculating point estimate (marginal HR) using local multiprocess in remote workers. This is only useful when clmq_hr = TRUE.
+#'@param control Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.
 #'@param n.boot Numeric. Number of bootstrap used.
-#'@param n_jobs Numeric. Number of remote workers via clustermq.
-#'@param local_cores Numeric. Number of cores or processes used in local multiprocess. This is only useful when local_se or clmq_local = TRUE.
+
 #'
 #'@return A vector containing the marginal beta (logHR), standard error, and 95% CI.
 #'
@@ -51,8 +45,8 @@
 #
 #'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 #
-#'get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=TRUE,
-#'M=1000,n.boot=10,n_jobs=10,data=oak,seed = 1,cpp=FALSE)
+#'get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor=cox_censor,SE=TRUE,
+#'M=1000,n.boot=10,data=oak,seed = 1,cpp=FALSE,control=clmqControl(n_jobs=100))
 #}
 #'}
 
@@ -60,22 +54,21 @@
 
 
 
-get_marginal_effect=function(trt, cox_event, cox_censor, data, M, SE=TRUE, seed=NULL, cpp=TRUE,
-                             memory=1024*32,local_se=FALSE,clmq_se=FALSE,clmq_hr=TRUE,clmq_local=TRUE,
-                             n.boot=1000,n_jobs=100,local_cores=1){
-
-  if(length(na.omit(unique(data[,trt])))!=2) stop(sprintf(c("treatment variable ",trt," must have 2 levels.")), call. = FALSE)
+get_marginal_effect=function(trt, cox_event, cox_censor, data, M, SE=TRUE, seed=NULL, cpp=TRUE,n.boot=1000,
+                             control=clmqControl()
+                             ){
 
   sanitize_coxmodel(cox_event,trt)
   sanitize_coxmodel(cox_censor,trt)
 
 
   output=get_point_estimate(trt=trt,cox_event=cox_event,cox_censor=cox_censor,data=data,M=M,seed=seed,cpp=cpp,
-                        memory=memory,local=clmq_local,clmq=clmq_hr)
+                            control=control
+                            )
 
   if(SE){
-    SE=get_variance_estimation(trt=trt,data=data,M=M,n.boot=n.boot,n_jobs=n_jobs,cox_event=cox_event,cox_censor=cox_censor,
-                               cpp=cpp,local=local_se,clmq=clmq_se,seed=seed,local_cores=local_cores,memory=memory)
+    SE=get_variance_estimation(trt=trt,data=data,M=M,n.boot=n.boot,cpp=cpp,control=control,
+                               cox_event=cox_event,cox_censor=cox_censor,seed=seed)
     output=c(beta=output,SE)
   }
 

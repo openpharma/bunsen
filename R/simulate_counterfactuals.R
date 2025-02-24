@@ -32,8 +32,8 @@
 #'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 #'
 #'bh <- basehaz(cox_event, centered = FALSE)
-#'s1_condi=calculate_statistics(model=cox_event,data=oak,type=1,trt='trt',bh=bh)
-#'sim_out_1d=simulate_counterfactuals(bh=bh,surv_cond = s1_condi,cpp=FALSE,M=1000)
+#'s_condi=calculate_statistics(model=cox_event,trt='trt')
+#'sim_out_1d=simulate_counterfactuals(bh=bh,surv_cond = s_condi$surv_cond0,cpp=FALSE,M=1000)
 
 simulate_counterfactuals=function(bh,surv_cond,M,cpp,loadcpp=TRUE){
   if(cpp){
@@ -42,7 +42,7 @@ simulate_counterfactuals=function(bh,surv_cond,M,cpp,loadcpp=TRUE){
     index_event_d = firstZeroIndex(newd)
 
   }else{
-    newd=matrix(rbinom(nrow(bh) * M, 1, surv_cond), nrow = nrow(bh), ncol = M)
+    newd=matrix(stats::rbinom(n=nrow(bh) * M, size=1, prob=surv_cond), nrow = nrow(bh), ncol = M)
     index_event_d = apply(newd, 2, function(x) which(x == 0)[1])
   }
 

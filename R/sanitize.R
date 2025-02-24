@@ -50,6 +50,11 @@ sanitize_coxmodel.coxph <- function(model, trt, ...){
 
   if(isTRUE(grepl(trt, attr(model$terms,'term.labels')[attr(model$terms,'order')>1]))) stop("treatment-covariate interaction is not supported at the moment.", call. = FALSE)
 
+  # check trt levels
+  data=model.frame(model)
+
+  if(length(na.omit(unique(data[,trt])))!=2) stop(sprintf(c("treatment variable ",trt," must have 2 levels.")), call. = FALSE)
+
 
 
 

@@ -13,14 +13,8 @@ get_marginal_effect(
   SE = TRUE,
   seed = NULL,
   cpp = TRUE,
-  memory = 1024 * 32,
-  local_se = FALSE,
-  clmq_se = FALSE,
-  clmq_hr = TRUE,
-  clmq_local = TRUE,
   n.boot = 1000,
-  n_jobs = 100,
-  local_cores = 1
+  control = clmqControl()
 )
 }
 \arguments{
@@ -32,7 +26,7 @@ get_marginal_effect(
 
 \item{data}{A data frame used for cox_event and cox_censor.}
 
-\item{M}{Numeric. The number of simulated counterfactual patients. Suggest to set above 1,000,000 to get robust estimation but it is time comsuming,}
+\item{M}{Numeric. The number of simulated counterfactual patients. Suggest to set a large number to get robust results, but this will be very time comsuming.}
 
 \item{SE}{Bool. True for estimating SE. False for not estimating SE.}
 
@@ -40,22 +34,9 @@ get_marginal_effect(
 
 \item{cpp}{Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.}
 
-\item{memory}{Numeric. Memory allocation for the remote workers.}
-
-\item{local_se}{Bool. True for calculating SE using local multiprocess in remote workers. This is only useful when clmq_se = TRUE.}
-
-\item{clmq_se}{Bool. True for using parallel computation via clustermq. This can be combined with local_se to calculate SE with nested parallel computation and
-local multiprocess. False for calculating SE in remote workers without nested parallel computation and local multiprocess.}
-
-\item{clmq_hr}{Bool. True for calculating point estimate (marginal HR) using parallel computation via clustermq.}
-
-\item{clmq_local}{Bool. True for calculating point estimate (marginal HR) using local multiprocess in remote workers. This is only useful when clmq_hr = TRUE.}
-
 \item{n.boot}{Numeric. Number of bootstrap used.}
 
-\item{n_jobs}{Numeric. Number of remote workers via clustermq.}
-
-\item{local_cores}{Numeric. Number of cores or processes used in local multiprocess. This is only useful when local_se or clmq_local = TRUE.}
+\item{control}{Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.}
 }
 \value{
 A vector containing the marginal beta (logHR), standard error, and 95\% CI.
@@ -63,7 +44,7 @@ A vector containing the marginal beta (logHR), standard error, and 95\% CI.
 \description{
 Use the simulation approach from Daniel et al. (2020) to estimate the marginal HR when adjusting covariates.
 Standard error of marginal HR was estimated via the nonparametric bootstrap.
-The standard error of HR will converge with the increase of bootstrap. We suggest setting M = 1,000,000
+The standard error of HR will converge with the increase of bootstrap. We suggest setting a large M
 for a more robust estimation. This function uses the parallel computation via remote LSF and local multiprocess. Additional
 feature also includes the C++ optimization that can speed up the calculation.
 }
@@ -82,8 +63,8 @@ data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
-get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor,SE=TRUE,
-M=1000,n.boot=10,n_jobs=10,data=oak,seed = 1,cpp=FALSE)
+get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor=cox_censor,SE=TRUE,
+M=1000,n.boot=10,data=oak,seed = 1,cpp=FALSE,control=clmqControl(n_jobs=100))
 }
 }
 \references{

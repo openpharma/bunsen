@@ -2,24 +2,17 @@
 % Please edit documentation in R/calculate_statistics.R
 \name{calculate_statistics}
 \alias{calculate_statistics}
-\title{Estimate the marginal causal survival curves}
+\title{Estimate the marginal causal survival curves using potential outcome framework}
 \usage{
-calculate_statistics(model, data, type, trt, bh)
+calculate_statistics(model, trt)
 }
 \arguments{
 \item{model}{A fitted \link[survival]{coxph} model. This should be a coxph event model or censoring model.}
 
-\item{data}{A data frame used in the coxph model. This data will be used for calculating the potential outcomes.}
-
-\item{type}{Numeric. 1 for the treatment group. 0 for the control or placebo group.
-Used in calculating the potential outcomes for corresponding groups.}
-
 \item{trt}{Character. Name of the treatment assignment variable.}
-
-\item{bh}{A data frame from the \link[survival]{basehaz} function. This is the baseline hazard for the coxph model.}
 }
 \value{
-A vector containing the marginal causal survival curves. Each number is the probability of the surviving the time window
+Two vectors containing the marginal causal survival curves for treatment arms (1 for treatment arm; 0 for control arm/placebo). Each number is the probability of the surviving the time window
 (t1,t2],... conditional on surviving the prior corresponding window.
 }
 \description{
@@ -38,8 +31,7 @@ library(survival)
 data('oak')
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-bh <- basehaz(cox_event, centered = FALSE)
-calculate_statistics(model=cox_event,data=oak,type=1,trt='trt',bh=bh)
+calculate_statistics(model=cox_event,trt='trt')
 
 
 }

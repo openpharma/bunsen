@@ -12,13 +12,10 @@
 #'@param cox_event Object. A coxph model using the survival time and survival status.
 #'@param cox_censor Object. A coxph model using the survival time and 1-survival status.
 #'@param data A data frame used for cox_event and cox_censor.
-#'@param M Numeric. The number of simulated counterfactual patients. Suggest to set above 1,000,000 to get robust estimation but it is time comsuming,
+#'@param M Numeric. The number of simulated counterfactual patients. Suggest to set a large M to get robust estimation but this will be time comsuming.
 #'@param seed Numeric. Random seed for simulation.
 #'@param cpp Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.
-#'@param memory Numeric. Memory allocation for the remote workers.
-#'@param clmq Bool. True for calculating point estimate (marginal HR) using parallel computation via clustermq.
-#'@param local Bool. True for calculating point estimate (marginal HR) using local multiprocess in remote workers. This is only useful when clmq_hr = TRUE.
-#'@param local_cores Numeric. Number of cores or processes used in local multiprocess. This is only useful when local = TRUE. Default = 1.
+#'@param control Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.
 #'
 #'@return The marginal beta (logHR)
 #'
@@ -40,39 +37,42 @@
 #'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 #
 #'get_point_estimate(trt = 'trt',cox_event=cox_event,cox_censor,M=1000,data=oak,
-#'seed = 1,cpp=FALSE,clmq=FALSE)
+#'seed = 1,cpp=FALSE,control=clmqControl())
 
 
 
 
 get_point_estimate=function(trt,cox_event,cox_censor,data,M=1000,seed=NULL,cpp=TRUE,
-                             memory=1024*16,local=FALSE,clmq=FALSE,local_cores=1){
+                            control=clmqControl()){
 
   bh <- basehaz(cox_event, centered = FALSE)
 
   bh_c <- basehaz(cox_censor, centered = FALSE)
 
-  s1_condi=calculate_statistics(model=cox_event,data=data,type=1,trt=trt,bh=bh)
-  s0_condi=calculate_statistics(model=cox_event,data=data,type=0,trt=trt,bh=bh)
+  s_condi <- calculate_statistics(model=cox_event,trt=trt)
+  s_condi_c <- calculate_statistics(model=cox_censor,trt=trt)
 
-  s1_condi_c=calculate_statistics(model=cox_censor,data=data,type=1,trt=trt,bh=bh_c)
-  s0_condi_c=calculate_statistics(model=cox_censor,data=data,type=0,trt=trt,bh=bh_c)
+  s1_condi <- s_condi$surv_cond1
+  s0_condi <- s_condi$surv_cond0
 
-  if(clmq){
+  s1_condi_c <- s_condi_c$surv_cond1
+  s0_condi_c <- s_condi_c$surv_cond0
+
+  if(control$clmq_hr){
     bh_all=list(bh=bh,bh_c=bh_c)
     s_all=list(s1_condi,s0_condi,s1_condi_c,s0_condi_c)
 
     if(is.null(seed)) seed=Sys.time()
 
-    if(local) options(clustermq.scheduler="multiprocess")
+    if(control$clmq_local) options(clustermq.scheduler="multiprocess")
     cat('Calculating point estimate in local clustermq using multiprocess...\n')
 
     sim_dt=Q(.fx_clsmq_simcoun, i_bh=c(1,1,2,2), j_surv_cond=1:4,
              const=list(M=M,cpp=cpp,bh_all=bh_all,
                         s_all=s_all),
-             n_jobs=4,memory = memory,seed=seed,
+             n_jobs=4,memory = control$memory,seed=seed,
              export = list(
-            simulate_counterfactuals=simulate_counterfactuals),template = list(cores = local_cores),pkgs = c('survival','Rcpp'))
+            simulate_counterfactuals=simulate_counterfactuals),template = list(cores = 1),pkgs = c('survival','Rcpp'))
 
     output=calculate_trt_effect(sim_out_1d =sim_dt[[1]] ,sim_out_0d = sim_dt[[2]],sim_out_1c =sim_dt[[3]] ,sim_out_0c = sim_dt[[4]])
 

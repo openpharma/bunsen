@@ -35,11 +35,11 @@
 #'status=oak$os.status
 #'arm=oak$trt
 #'covariates=oak[,c("btmb","pdl1")]
-#'get_rmst_est(time, status, arm, covariates,tau,SE='delta')
+#'get_rmst_estimate(time, status, arm, covariates,tau,SE='delta')
 #'
 
 
-get_rmst_est=function(time, status, arm, covariates=NULL,tau,SE='delta',n.boot=1000){
+get_rmst_estimate=function(time, status, arm, covariates=NULL,tau,SE='delta',n.boot=1000){
   tau_max=min(max(time[arm==0]),max(time[arm==1]))
   if(tau>tau_max) stop(sprintf(c("The maximum tau of current sampe is ",round(tau_max,3),". Please choose a reasonable tau.")), call. = FALSE)
   if(tau<=0) stop(sprintf(c("Tau should be greater than 0!")), call. = FALSE)

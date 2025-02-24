@@ -1,4 +1,4 @@
-#'Estimate the marginal causal survival curves
+#'Estimate the marginal causal survival curves using potential outcome framework
 #'
 #'@description
 #'Estimate the marginal causal survival curves for simulating time-to-event data in a discrete manner
@@ -14,13 +14,9 @@
 #'is S(t2)∕S(t1), and so on. This function returns the S(t2)/S(t1) in series.
 #'
 #'@param model A fitted \link[survival]{coxph} model. This should be a coxph event model or censoring model.
-#'@param data A data frame used in the coxph model. This data will be used for calculating the potential outcomes.
-#'@param type Numeric. 1 for the treatment group. 0 for the control or placebo group.
-#'Used in calculating the potential outcomes for corresponding groups.
 #'@param trt Character. Name of the treatment assignment variable.
-#'@param bh A data frame from the \link[survival]{basehaz} function. This is the baseline hazard for the coxph model.
-#'
-#'@return A vector containing the marginal causal survival curves. Each number is the probability of the surviving the time window
+
+#'@return Two vectors containing the marginal causal survival curves for treatment arms (1 for treatment arm; 0 for control arm/placebo). Each number is the probability of the surviving the time window
 #'(t1,t2],... conditional on surviving the prior corresponding window.
 #'
 #'@references
@@ -35,26 +31,39 @@
 #'data('oak')
 #'
 #'cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-#'bh <- basehaz(cox_event, centered = FALSE)
-#'calculate_statistics(model=cox_event,data=oak,type=1,trt='trt',bh=bh)
+#'calculate_statistics(model=cox_event,trt='trt')
 #'
 #'
 
-calculate_statistics=function(model,data,type,trt,bh){
+calculate_statistics=function(model,trt){
 
-  sanitize_coxmodel(model,trt)
+  bh <- basehaz(model, centered = FALSE)
 
-  dt=model.frame(model,data)
+  dt0=dt1=model.frame(model)
 
-  if(type==1) dt[trt]=1
-  if(type==0) dt[trt]=0
+  ntrt=sort(unlist(unique(dt0[trt])))
 
-  pred=predict(model,newdata = dt,type='risk',reference = 'zero')
+  dt0[trt]=ntrt[1]
+
+  dt1[trt]=ntrt[2]
+
+  pred=predict(model,newdata = dt0,type='risk',reference = 'zero')
   survf=exp(-pred%*%t(bh$hazard))
 
   survf_mean=colMeans(survf)
   survf_1=c(1,survf_mean[1:(length(survf_mean)-1)])
-  surv_cond=survf_mean/survf_1
-  return(surv_cond)
+  surv_cond0=survf_mean/survf_1
+
+  pred=predict(model,newdata = dt1,type='risk',reference = 'zero')
+  survf=exp(-pred%*%t(bh$hazard))
+
+  survf_mean=colMeans(survf)
+  survf_1=c(1,survf_mean[1:(length(survf_mean)-1)])
+  surv_cond1=survf_mean/survf_1
+
+  output=list(surv_cond0=surv_cond0,surv_cond1=surv_cond1)
+
+
+  return(output)
 }
 

@@ -11,17 +11,10 @@
 #'@param trt Character. Variable name of the treatment assignment. Only support two arm trial at the moment.
 #'@param data A data frame used for cox_event and cox_censor.
 #'@param n.boot Numeric. Number of bootstrap.
-#'@param n_jobs Numeric. Number of remote workers.
 #'@param M Numeric. The number of simulated counterfactual patients. Suggest to set above 1,000,000 to get robust estimation but it is time comsuming,
 #'@param seed Numeric. Random seed for simulation.
 #'@param cpp Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.
-#'@param memory Numeric. Memory allocation for the remote workers.
-#'@param local Bool. True for calculating SE using local multiprocess in remote workers. This is only useful when clmq = TRUE.
-#'@param clmq Bool. False for calculating SE only in remote workers without nested parallel computation and local multiprocess.
-#'True for using parallel computation via clustermq. This can be combined with local to calculate SE with nested parallel computation and
-#'local multiprocess.
-#'@param local_cores Numeric. Number of cores or processes used in local multiprocess. This is only useful when local = TRUE. Default = 1.
-#'
+#'@param control Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.
 #'@return A vector containing SE and 95% CI.
 #'
 #'@references
@@ -45,32 +38,34 @@
 #'cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 #
 #'get_variance_estimation(cox_event,cox_censor,trt='trt',data=oak,
-#'M=1000,n.boot=10,n_jobs=10,cpp=FALSE)
+#'M=1000,n.boot=10,control=clmqControl(),cpp=FALSE)
 #'}
 
 
 
-get_variance_estimation=function(cox_event,cox_censor,trt,data,M,n.boot,n_jobs,memory=1024*32,cpp=TRUE,local=FALSE,clmq=TRUE,
-                                 seed=NULL,local_cores=1){
+get_variance_estimation=function(cox_event,cox_censor,trt,data,M,n.boot,seed=NULL,cpp=TRUE,
+                                 control=clmqControl()){
   if(is.null(seed)) seed=Sys.time()
   cat(paste0('Calculating SE in clustermq using bootstrap N = ',n.boot,'...\n'))
 
   options(clustermq.scheduler="LSF")
 
 
-  out=Q(fun = .fx.clsmq.cpp,i=1:n.boot,n_jobs = n_jobs,
+  out=Q(fun = .fx.clsmq.cpp,i=1:n.boot,n_jobs = control$n_jobs,
         const=list(
-        memory = memory,data=data,
+        memory = control$memory,data=data,
         cox_event=cox_event,cox_censor=cox_censor,
-        trt=trt,local=local,clmq=clmq,
+        trt=trt,local=control$local_se,clmq=control$clmq_se,
         M=M,cpp=cpp,seed=seed),
         export = list(
                       get_point_estimate=get_point_estimate,
                       calculate_statistics=calculate_statistics,
                       calculate_trt_effect=calculate_trt_effect,
                       simulate_counterfactuals=simulate_counterfactuals,
+                      clmqControl=clmqControl,
                       .fx_clsmq_simcoun=.fx_clsmq_simcoun
-        ),template = list(cores = local_cores),pkgs = c('survival','Rcpp','clustermq'))
+        ),
+        template = list(cores = control$local_cores),pkgs = c('survival','Rcpp','clustermq'))
   hr_se=do.call(c,out)
   se=sd(hr_se)
   lb=quantile(hr_se, prob=.025)
@@ -92,6 +87,6 @@ get_variance_estimation=function(cox_event,cox_censor,trt,data,M,n.boot,n_jobs,m
   cox_censor_tmp <- update(cox_censor,data=tmp.dt)
 
   hr_tmp <- get_point_estimate(trt=trt,cox_event = cox_event_tmp,cox_censor = cox_censor_tmp,data=tmp.dt,M=M,seed=seed,cpp=cpp,
-                               memory=memory,local=local,clmq=clmq)
+                               control=clmqControl(clmq_hr=clmq,clmq_local=local,memory=memory))
   return(hr_tmp)
 }
