@@ -38,61 +38,97 @@
 #'get_rmst_est(time, status, arm, covariates,tau,SE='delta')
 #'
 
+get_rmst_est <- function(
+  time,
+  status,
+  arm,
+  covariates = NULL,
+  tau,
+  SE = 'delta',
+  n.boot = 1000
+) {
+  tau_max <- min(max(time[arm == 0]), max(time[arm == 1]))
+  if (tau > tau_max)
+    stop(
+      sprintf(c(
+        "The maximum tau of current sampe is ",
+        round(tau_max, 3),
+        ". Please choose a reasonable tau."
+      )),
+      call. = FALSE
+    )
+  if (tau <= 0) stop(sprintf(c("Tau should be greater than 0!")), call. = FALSE)
 
-get_rmst_est=function(time, status, arm, covariates=NULL,tau,SE='delta',n.boot=1000){
-  tau_max=min(max(time[arm==0]),max(time[arm==1]))
-  if(tau>tau_max) stop(sprintf(c("The maximum tau of current sampe is ",round(tau_max,3),". Please choose a reasonable tau.")), call. = FALSE)
-  if(tau<=0) stop(sprintf(c("Tau should be greater than 0!")), call. = FALSE)
+  if (is.null(covariates)) {
+    results <- rmst_unadjust(time, status, arm, tau)
+  } else {
+    covariates <- as.data.frame(covariates)
 
-  if(is.null(covariates)){
+    dt <- as.data.frame(cbind(time, status, arm, covariates))
 
-    results=rmst_unadjust(time,status,arm,tau)
+    fit <- coxph(
+      as.formula(paste0(
+        'Surv(time, status) ~ ',
+        paste(names(covariates), collapse = '+'),
+        '+strata(arm)'
+      )),
+      data = dt
+    )
 
-  }else{
-    covariates=as.data.frame(covariates)
+    delta <- rmst_point_estimate(fit, dt = dt, tau)
+    output <- delta$output
 
-    dt=as.data.frame(cbind(time,status, arm, covariates))
+    if (SE == 'boot') {
+      out <- boot(
+        data = dt,
+        .rmst_boot_fx,
+        R = n.boot,
+        fit = fit,
+        tau = tau,
+        covariates = covariates
+      )
 
-    fit=coxph(as.formula(paste0('Surv(time, status) ~ ',paste(names(covariates),collapse = '+'),'+strata(arm)')),data = dt)
-
-    delta=rmst_point_estimate(fit,dt=dt,tau)
-
-    output=delta$output
-
-    if(SE=='boot'){
-
-      out=boot(data=dt,.rmst_boot_fx,R=n.boot,fit=fit,tau=tau,covariates=covariates)
-
-      se=sd(out$t,na.rm = T)
-      lb=quantile(out$t, prob=.025,na.rm=T)
-      ub=quantile(out$t, prob=.975,na.rm=T)
-      out=c(SE=se,lb,ub)
-
-    }else if(SE=='delta') {
-
-      out=rmst_delta(fit,time, arm, covariates,tau,surv0=delta$surv0,surv1=delta$surv1,cumhaz0=delta$cumhaz0,cumhaz1=delta$cumhaz1)
-      out=c(SE=out,`2.5%`=output-1.96*out,`97.5%`=output+1.96*out)
-
+      se <- sd(out$t, na.rm = T)
+      lb <- quantile(out$t, prob = .025, na.rm = T)
+      ub <- quantile(out$t, prob = .975, na.rm = T)
+      out <- c(SE = se, lb, ub)
+    } else if (SE == 'delta') {
+      out <- rmst_delta(
+        fit,
+        time,
+        arm,
+        covariates,
+        tau,
+        surv0 = delta$surv0,
+        surv1 = delta$surv1,
+        cumhaz0 = delta$cumhaz0,
+        cumhaz1 = delta$cumhaz1
+      )
+      out <- c(
+        SE = out,
+        `2.5%` = output - 1.96 * out,
+        `97.5%` = output + 1.96 * out
+      )
     }
 
-    results=list(RMST=output,SE=out)
+    results <- list(RMST = output, SE = out)
   }
 
   return(results)
-
 }
 
-.rmst_boot_fx=function(data,idx,fit,tau,covariates){
+.rmst_boot_fx <- function(data, idx, fit, tau, covariates) {
+  fit_tmp <- update(fit, data = data[idx, ])
 
-  fit_tmp <- update(fit,data=data[idx,])
-  tmax=basehaz(fit_tmp)
-  tmax0=max(tmax$time[tmax$strata==unique(tmax$strata)[1]])
-  tmax1=max(tmax$time[tmax$strata==unique(tmax$strata)[2]])
-  if(tmax0<tau |tmax1<tau) {
-    output=NA
-  }else{
-    out=rmst_point_estimate(fit=fit_tmp,dt=data[idx,],tau=tau)
-    output=out$output
+  tmax <- basehaz(fit_tmp)
+  tmax0 <- max(tmax$time[tmax$strata == unique(tmax$strata)[1]])
+  tmax1 <- max(tmax$time[tmax$strata == unique(tmax$strata)[2]])
+
+  if (tmax0 < tau | tmax1 < tau) {
+    output <- NA
+  } else {
+    out <- rmst_point_estimate(fit = fit_tmp, dt = data[idx, ], tau = tau)
+    output <- out$output
   }
   return(output)
 }

@@ -41,33 +41,34 @@
 #'delta=rmst_point_estimate(fit,dt=dt,tau)
 #'delta$output
 
-
-rmst_point_estimate=function(fit,dt,tau){
-
-  cumhaz=basehaz(fit,centered = FALSE)
+rmst_point_estimate <- function(fit, dt, tau) {
+  cumhaz <- basehaz(fit, centered = FALSE)
 
   grp <- unique(cumhaz$strata)
+  cumhaz0 <- cumhaz[cumhaz$strata == grp[1] & cumhaz$time <= tau, ]
+  cumhaz1 <- cumhaz[cumhaz$strata == grp[2] & cumhaz$time <= tau, ]
 
-  cumhaz0 <- cumhaz[cumhaz$strata==grp[1] & cumhaz$time<=tau, ]
+  pred <- predict(fit, newdata = dt, type = 'risk', reference = 'zero')
 
-  cumhaz1 <- cumhaz[cumhaz$strata==grp[2] & cumhaz$time<=tau, ]
+  surv0 <- exp(-pred %*% t(cumhaz0$hazard))
+  surv0_mean <- apply(surv0, 2, mean)
 
-  pred=predict(fit,newdata=dt,type='risk',reference = 'zero')
+  d_t0 <- diff(c(0, cumhaz0$time, tau))
+  mu0 <- sum(c(1, surv0_mean) * d_t0)
 
-  surv0=exp(-pred%*%t(cumhaz0$hazard))
-  surv0_mean= apply(surv0, 2, mean)
+  surv1 <- exp(-pred %*% t(cumhaz1$hazard))
+  surv1_mean <- apply(surv1, 2, mean)
 
-  d_t0=diff(c(0,cumhaz0$time,tau))
+  d_t1 <- diff(c(0, cumhaz1$time, tau))
+  mu1 <- sum(c(1, surv1_mean) * d_t1)
 
-  mu0=sum(c(1,surv0_mean)*d_t0)
+  output <- mu1 - mu0
 
-  surv1=exp(-pred%*%t(cumhaz1$hazard))
-  surv1_mean=apply(surv1, 2, mean)
-
-  d_t1=diff(c(0,cumhaz1$time,tau))
-
-  mu1=sum(c(1,surv1_mean)*d_t1)
-
-  output=mu1-mu0
-  return(list(output=output,surv0=surv0,cumhaz0=cumhaz0,surv1=surv1,cumhaz1=cumhaz1))
+  return(list(
+    output = output,
+    surv0 = surv0,
+    cumhaz0 = cumhaz0,
+    surv1 = surv1,
+    cumhaz1 = cumhaz1
+  ))
 }
