@@ -11,13 +11,9 @@ get_variance_estimation(
   data,
   M,
   n.boot,
-  n_jobs,
-  memory = 1024 * 32,
-  cpp = TRUE,
-  local = FALSE,
-  clmq = TRUE,
   seed = NULL,
-  local_cores = 1
+  cpp = TRUE,
+  control = clmqControl()
 )
 }
 \arguments{
@@ -33,21 +29,11 @@ get_variance_estimation(
 
 \item{n.boot}{Numeric. Number of bootstrap.}
 
-\item{n_jobs}{Numeric. Number of remote workers.}
-
-\item{memory}{Numeric. Memory allocation for the remote workers.}
+\item{seed}{Numeric. Random seed for simulation.}
 
 \item{cpp}{Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.}
 
-\item{local}{Bool. True for calculating SE using local multiprocess in remote workers. This is only useful when clmq = TRUE.}
-
-\item{clmq}{Bool. False for calculating SE only in remote workers without nested parallel computation and local multiprocess.
-True for using parallel computation via clustermq. This can be combined with local to calculate SE with nested parallel computation and
-local multiprocess.}
-
-\item{seed}{Numeric. Random seed for simulation.}
-
-\item{local_cores}{Numeric. Number of cores or processes used in local multiprocess. This is only useful when local = TRUE. Default = 1.}
+\item{control}{Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.}
 }
 \value{
 A vector containing SE and 95\% CI.
@@ -68,7 +54,7 @@ data('oak')
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 get_variance_estimation(cox_event,cox_censor,trt='trt',data=oak,
-M=1000,n.boot=10,n_jobs=10,cpp=FALSE)
+M=1000,n.boot=10,control=clmqControl(),cpp=FALSE)
 }
 }
 \references{

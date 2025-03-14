@@ -12,10 +12,7 @@ get_point_estimate(
   M = 1000,
   seed = NULL,
   cpp = TRUE,
-  memory = 1024 * 16,
-  local = FALSE,
-  clmq = FALSE,
-  local_cores = 1
+  control = clmqControl()
 )
 }
 \arguments{
@@ -27,19 +24,13 @@ get_point_estimate(
 
 \item{data}{A data frame used for cox_event and cox_censor.}
 
-\item{M}{Numeric. The number of simulated counterfactual patients. Suggest to set above 1,000,000 to get robust estimation but it is time comsuming,}
+\item{M}{Numeric. The number of simulated counterfactual patients. Suggest to set a large M to get robust estimation but this will be time comsuming.}
 
 \item{seed}{Numeric. Random seed for simulation.}
 
 \item{cpp}{Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.}
 
-\item{memory}{Numeric. Memory allocation for the remote workers.}
-
-\item{local}{Bool. True for calculating point estimate (marginal HR) using local multiprocess in remote workers. This is only useful when clmq_hr = TRUE.}
-
-\item{clmq}{Bool. True for calculating point estimate (marginal HR) using parallel computation via clustermq.}
-
-\item{local_cores}{Numeric. Number of cores or processes used in local multiprocess. This is only useful when local = TRUE. Default = 1.}
+\item{control}{Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.}
 }
 \value{
 The marginal beta (logHR)
@@ -59,7 +50,7 @@ data('oak')
 cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 get_point_estimate(trt = 'trt',cox_event=cox_event,cox_censor,M=1000,data=oak,
-seed = 1,cpp=FALSE,clmq=FALSE)
+seed = 1,cpp=FALSE,control=clmqControl())
 }
 \references{
 Daniel R, Zhang J, Farewell D. Making apples from oranges:

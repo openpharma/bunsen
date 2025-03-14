@@ -40,25 +40,20 @@ sanitize_coxmodel.default <- function(model, ...) {
 #' @export
 sanitize_coxmodel.coxph <- function(model, trt, ...) {
   # check strata
-  if (any(grepl('strata', attr(model$terms, 'term.labels'))))
-    stop(sprintf(c("strata is not supported at the moment.")), call. = FALSE)
+
+  if (any(grepl("strata", attr(model$terms, "term.labels")))) stop(sprintf(c("strata is not supported at the moment.")), call. = FALSE)
 
   # check if trt included in the model
-  if (!trt %in% attr(model$terms, 'term.labels'))
-    stop(
-      sprintf(c("treatment variable ", trt, " is not included in the model.")),
-      call. = FALSE
-    )
+
+  if (!trt %in% attr(model$terms, "term.labels")) stop(sprintf(c("treatment variable ", trt, " is not included in the model.")), call. = FALSE)
 
   # check trt-covariate interactions
-  if (
-    isTRUE(grepl(
-      trt,
-      attr(model$terms, 'term.labels')[attr(model$terms, 'order') > 1]
-    ))
-  )
-    stop(
-      "treatment-covariate interaction is not supported at the moment.",
-      call. = FALSE
-    )
+
+  if (isTRUE(grepl(trt, attr(model$terms, "term.labels")[attr(model$terms, "order") > 1]))) stop("treatment-covariate interaction is not supported at the moment.", call. = FALSE)
+
+  # check trt levels
+  data <- model.frame(model)
+
+  if (length(na.omit(unique(data[, trt]))) != 2) stop(sprintf(c("treatment variable ", trt, " must have 2 levels.")), call. = FALSE)
+
 }

@@ -24,4 +24,3 @@ test_that("trt by covariate interactions not allowed in model", {
 # - expected type of treatment, should it be a factor?
 # - how many levels of treatment are supported?
 # - detect whether cox model converged and warn user if not?
-

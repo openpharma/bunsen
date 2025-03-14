@@ -6,7 +6,7 @@
 \alias{bunsen-package}
 \title{bunsen: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials}
 \description{
-A lightweight package aims to provide an easy-to-use interface for estimating marginal or unconditional Hazard Ratio (HR) and Restricted Mean Survival Time (RMST) when adjusting prognostic covariates in clinical trials.
+Provides an efficient and robust implementation for estimating marginal Hazard Ratio (HR) and Restricted Mean Survival Time (RMST) with covariate adjustment using Daniel et al (2021) \url{https://doi.org/10.1002/bimj.201900297} and Karrison et al (2018) \url{https://doi.org/10.1177/1740774518759281}.
 }
 \author{
 \strong{Maintainer}: Xinlei Deng \email{xinlei.deng@novartis.com} (\href{https://orcid.org/0000-0001-8129-6007}{ORCID})
