@@ -21,10 +21,12 @@ sanitize_coxmodel <- function(model, ...) {
 #' @export
 sanitize_coxmodel.default <- function(model, ...) {
   if (!inherits(model, "coxph")) {
-    msg <- c(sprintf('model of class "%s" is not supported and please use coxph instead.', class(model)[1]))
+    msg <- c(sprintf(
+      'model of class "%s" is not supported and please use coxph instead.',
+      class(model)[1]
+    ))
     stop(msg, call. = FALSE)
   }
-
 }
 
 
@@ -36,22 +38,27 @@ sanitize_coxmodel.default <- function(model, ...) {
 #' @param trt Character. Name of the treatment assignment variable.
 #' @keywords internal
 #' @export
-sanitize_coxmodel.coxph <- function(model, trt, ...){
-
+sanitize_coxmodel.coxph <- function(model, trt, ...) {
   # check strata
-
-  if(any(grepl('strata', attr(model$terms,'term.labels')))) stop(sprintf(c("strata is not supported at the moment.")), call. = FALSE)
+  if (any(grepl('strata', attr(model$terms, 'term.labels'))))
+    stop(sprintf(c("strata is not supported at the moment.")), call. = FALSE)
 
   # check if trt included in the model
-
-  if(!trt%in%attr(model$terms,'term.labels')) stop(sprintf(c("treatment variable ",trt," is not included in the model.")), call. = FALSE)
+  if (!trt %in% attr(model$terms, 'term.labels'))
+    stop(
+      sprintf(c("treatment variable ", trt, " is not included in the model.")),
+      call. = FALSE
+    )
 
   # check trt-covariate interactions
-
-  if(isTRUE(grepl(trt, attr(model$terms,'term.labels')[attr(model$terms,'order')>1]))) stop("treatment-covariate interaction is not supported at the moment.", call. = FALSE)
-
-
-
-
+  if (
+    isTRUE(grepl(
+      trt,
+      attr(model$terms, 'term.labels')[attr(model$terms, 'order') > 1]
+    ))
+  )
+    stop(
+      "treatment-covariate interaction is not supported at the moment.",
+      call. = FALSE
+    )
 }
-

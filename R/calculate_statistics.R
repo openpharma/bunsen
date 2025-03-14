@@ -40,21 +40,19 @@
 #'
 #'
 
-calculate_statistics=function(model,data,type,trt,bh){
+calculate_statistics <- function(model, data, type, trt, bh) {
+  sanitize_coxmodel(model, trt)
+  dt <- model.frame(model, data)
 
-  sanitize_coxmodel(model,trt)
+  if (type == 1) dt[trt] <- 1
+  if (type == 0) dt[trt] <- 0
 
-  dt=model.frame(model,data)
+  pred <- predict(model, newdata = dt, type = 'risk', reference = 'zero')
+  survf <- exp(-pred %*% t(bh$hazard))
 
-  if(type==1) dt[trt]=1
-  if(type==0) dt[trt]=0
+  survf_mean <- colMeans(survf)
+  survf_1 <- c(1, survf_mean[1:(length(survf_mean) - 1)])
+  surv_cond <- survf_mean / survf_1
 
-  pred=predict(model,newdata = dt,type='risk',reference = 'zero')
-  survf=exp(-pred%*%t(bh$hazard))
-
-  survf_mean=colMeans(survf)
-  survf_1=c(1,survf_mean[1:(length(survf_mean)-1)])
-  surv_cond=survf_mean/survf_1
   return(surv_cond)
 }
-

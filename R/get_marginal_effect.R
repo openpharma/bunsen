@@ -56,27 +56,63 @@
 #}
 #'}
 
+get_marginal_effect <- function(
+  trt,
+  cox_event,
+  cox_censor,
+  data,
+  M,
+  SE = TRUE,
+  seed = NULL,
+  cpp = TRUE,
+  memory = 1024 * 32,
+  local_se = FALSE,
+  clmq_se = FALSE,
+  clmq_hr = TRUE,
+  clmq_local = TRUE,
+  n.boot = 1000,
+  n_jobs = 100,
+  local_cores = 1
+) {
+  if (length(na.omit(unique(data[, trt]))) != 2)
+    stop(
+      sprintf(c("treatment variable ", trt, " must have 2 levels.")),
+      call. = FALSE
+    )
 
+  sanitize_coxmodel(cox_event, trt)
+  sanitize_coxmodel(cox_censor, trt)
 
+  output <- get_point_estimate(
+    trt = trt,
+    cox_event = cox_event,
+    cox_censor = cox_censor,
+    data = data,
+    M = M,
+    seed = seed,
+    cpp = cpp,
+    memory = memory,
+    local = clmq_local,
+    clmq = clmq_hr
+  )
 
-
-get_marginal_effect=function(trt, cox_event, cox_censor, data, M, SE=TRUE, seed=NULL, cpp=TRUE,
-                             memory=1024*32,local_se=FALSE,clmq_se=FALSE,clmq_hr=TRUE,clmq_local=TRUE,
-                             n.boot=1000,n_jobs=100,local_cores=1){
-
-  if(length(na.omit(unique(data[,trt])))!=2) stop(sprintf(c("treatment variable ",trt," must have 2 levels.")), call. = FALSE)
-
-  sanitize_coxmodel(cox_event,trt)
-  sanitize_coxmodel(cox_censor,trt)
-
-
-  output=get_point_estimate(trt=trt,cox_event=cox_event,cox_censor=cox_censor,data=data,M=M,seed=seed,cpp=cpp,
-                        memory=memory,local=clmq_local,clmq=clmq_hr)
-
-  if(SE){
-    SE=get_variance_estimation(trt=trt,data=data,M=M,n.boot=n.boot,n_jobs=n_jobs,cox_event=cox_event,cox_censor=cox_censor,
-                               cpp=cpp,local=local_se,clmq=clmq_se,seed=seed,local_cores=local_cores,memory=memory)
-    output=c(beta=output,SE)
+  if (SE) {
+    SE <- get_variance_estimation(
+      trt = trt,
+      data = data,
+      M = M,
+      n.boot = n.boot,
+      n_jobs = n_jobs,
+      cox_event = cox_event,
+      cox_censor = cox_censor,
+      cpp = cpp,
+      local = local_se,
+      clmq = clmq_se,
+      seed = seed,
+      local_cores = local_cores,
+      memory = memory
+    )
+    output <- c(beta = output, SE)
   }
 
   return(output)
