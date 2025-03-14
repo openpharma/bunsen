@@ -48,50 +48,95 @@
 #'M=1000,n.boot=10,n_jobs=10,cpp=FALSE)
 #'}
 
+get_variance_estimation <- function(
+  cox_event,
+  cox_censor,
+  trt,
+  data,
+  M,
+  n.boot,
+  n_jobs,
+  memory = 1024 * 32,
+  cpp = TRUE,
+  local = FALSE,
+  clmq = TRUE,
+  seed = NULL,
+  local_cores = 1
+) {
+  if (is.null(seed)) seed <- Sys.time()
+  cat(paste0(
+    'Calculating SE in clustermq using bootstrap N = ',
+    n.boot,
+    '...\n'
+  ))
 
+  options(clustermq.scheduler = "LSF")
 
-get_variance_estimation=function(cox_event,cox_censor,trt,data,M,n.boot,n_jobs,memory=1024*32,cpp=TRUE,local=FALSE,clmq=TRUE,
-                                 seed=NULL,local_cores=1){
-  if(is.null(seed)) seed=Sys.time()
-  cat(paste0('Calculating SE in clustermq using bootstrap N = ',n.boot,'...\n'))
+  out <- Q(
+    fun = .fx.clsmq.cpp,
+    i = 1:n.boot,
+    n_jobs = n_jobs,
+    const = list(
+      memory = memory,
+      data = data,
+      cox_event = cox_event,
+      cox_censor = cox_censor,
+      trt = trt,
+      local = local,
+      clmq = clmq,
+      M = M,
+      cpp = cpp,
+      seed = seed
+    ),
+    export <- list(
+      get_point_estimate = get_point_estimate,
+      calculate_statistics = calculate_statistics,
+      calculate_trt_effect = calculate_trt_effect,
+      simulate_counterfactuals = simulate_counterfactuals,
+      .fx_clsmq_simcoun = .fx_clsmq_simcoun
+    ),
+    template <- list(cores = local_cores),
+    pkgs <- c('survival', 'Rcpp', 'clustermq')
+  )
 
-  options(clustermq.scheduler="LSF")
+  hr_se <- do.call(c, out)
+  se <- sd(hr_se)
+  lb <- quantile(hr_se, prob = .025)
 
-
-  out=Q(fun = .fx.clsmq.cpp,i=1:n.boot,n_jobs = n_jobs,
-        const=list(
-        memory = memory,data=data,
-        cox_event=cox_event,cox_censor=cox_censor,
-        trt=trt,local=local,clmq=clmq,
-        M=M,cpp=cpp,seed=seed),
-        export = list(
-                      get_point_estimate=get_point_estimate,
-                      calculate_statistics=calculate_statistics,
-                      calculate_trt_effect=calculate_trt_effect,
-                      simulate_counterfactuals=simulate_counterfactuals,
-                      .fx_clsmq_simcoun=.fx_clsmq_simcoun
-        ),template = list(cores = local_cores),pkgs = c('survival','Rcpp','clustermq'))
-  hr_se=do.call(c,out)
-  se=sd(hr_se)
-  lb=quantile(hr_se, prob=.025)
-  ub=quantile(hr_se, prob=.975)
-  return(output=c(se=se,lb,ub))
+  return(output = c(se = se, lb, ub))
 }
 
 
-
-.fx.clsmq.cpp=function(i,data=data,cox_event=cox_event,cox_censor=cox_censor,trt=trt,M=M,seed=seed,cpp=cpp,
-                       memory=memory,local=local,clmq=clmq){
-
-  tmp <- sample(1:nrow(data), size=nrow(data), replace=TRUE)
-
+.fx.clsmq.cpp <- function(
+  i,
+  data = data,
+  cox_event = cox_event,
+  cox_censor = cox_censor,
+  trt = trt,
+  M = M,
+  seed = seed,
+  cpp = cpp,
+  memory = memory,
+  local = local,
+  clmq = clmq
+) {
+  tmp <- sample(1:nrow(data), size = nrow(data), replace = TRUE)
   tmp.dt <- data[tmp, ]
 
-  cox_event_tmp <- update(cox_event,data=tmp.dt)
+  cox_event_tmp <- update(cox_event, data = tmp.dt)
+  cox_censor_tmp <- update(cox_censor, data = tmp.dt)
 
-  cox_censor_tmp <- update(cox_censor,data=tmp.dt)
-
-  hr_tmp <- get_point_estimate(trt=trt,cox_event = cox_event_tmp,cox_censor = cox_censor_tmp,data=tmp.dt,M=M,seed=seed,cpp=cpp,
-                               memory=memory,local=local,clmq=clmq)
+  hr_tmp <- get_point_estimate(
+    trt = trt,
+    cox_event = cox_event_tmp,
+    cox_censor = cox_censor_tmp,
+    data = tmp.dt,
+    M = M,
+    seed = seed,
+    cpp = cpp,
+    memory = memory,
+    local = local,
+    clmq = clmq
+  )
   return(hr_tmp)
 }
