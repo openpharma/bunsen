@@ -9,7 +9,7 @@ clmqControl(
   local_se = FALSE,
   clmq_se = FALSE,
   clmq_hr = TRUE,
-  clmq_local = TRUE,
+  clmq_local = FALSE,
   n_jobs = 100,
   local_cores = 1
 )
@@ -19,8 +19,7 @@ clmqControl(
 
 \item{local_se}{Bool. True for calculating SE using local multiprocess in remote workers. This is only useful when clmq_se = TRUE.}
 
-\item{clmq_se}{Bool. True for using parallel computation via clustermq. This can be combined with local_se to calculate SE with nested parallel computation and
-local multiprocess. False for calculating SE in remote workers without nested parallel computation and local multiprocess.}
+\item{clmq_se}{Bool. True for using parallel computation (nested or local) via clustermq. This can be combined with local_se to calculate SE with nested parallel computation or local multiprocess. Nested parallel computation means double parallel computations -- each worker will do a parallel computation for \link[bunsen]{simulate_counterfactuals}. False for calculating SE only in remote workers without nested parallel computation and local multiprocess.}
 
 \item{clmq_hr}{Bool. True for calculating point estimate (marginal HR) using parallel computation via clustermq.}
 
@@ -42,11 +41,17 @@ The control function provides options to set the memory of each remote node, num
 \examples{
 \dontrun{
 library(survival)
-data('oak')
+data("oak")
 
-cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
-get_marginal_effect(trt = 'trt',cox_event=cox_event,cox_censor=cox_censor,SE=TRUE,
-M=1000,n.boot=10,data=oak,seed = 1,cpp=FALSE,control=clmqControl())
+cox_event <- coxph(Surv(OS, os.status) ~ trt + btmb + pdl1, data = oak)
+#
+cox_censor <- coxph(Surv(OS, 1 - os.status) ~ trt + btmb + pdl1, data = oak)
+#
+get_marginal_effect(
+  trt = "trt", cox_event = cox_event, cox_censor = cox_censor, SE = TRUE,
+  M = 1000, n.boot = 10, data = oak, seed = 1, cpp = FALSE, control = clmqControl()
+)
+#
 }
+
 }

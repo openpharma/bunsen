@@ -29,10 +29,14 @@
 #' bh_c <- basehaz(cox_censor, centered = FALSE)
 #' s_condi <- calculate_statistics(model = cox_event, trt = "trt")
 #' s_condi_c <- calculate_statistics(model = cox_censor, trt = "trt")
-#' sim_out_1d <- simulate_counterfactuals(bh = bh, surv_cond = s_condi$surv_cond1, cpp = FALSE, M = 1000)
-#' sim_out_0d <- simulate_counterfactuals(bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
-#' sim_out_1c <- simulate_counterfactuals(bh = bh_c, surv_cond = s_condi_c$surv_cond1, cpp = FALSE, M = 1000)
-#' sim_out_0c <- simulate_counterfactuals(bh = bh_c, surv_cond = s_condi_c$surv_cond0, cpp = FALSE, M = 1000)
+#' sim_out_1d <- simulate_counterfactuals(
+#' bh = bh, surv_cond = s_condi$surv_cond1, cpp = FALSE, M = 1000)
+#' sim_out_0d <- simulate_counterfactuals(
+#' bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
+#' sim_out_1c <- simulate_counterfactuals(
+#' bh = bh_c, surv_cond = s_condi_c$surv_cond1, cpp = FALSE, M = 1000)
+#' sim_out_0c <- simulate_counterfactuals(
+#' bh = bh_c, surv_cond = s_condi_c$surv_cond0, cpp = FALSE, M = 1000)
 #'
 #' output <- calculate_trt_effect(sim_out_1d, sim_out_0d, sim_out_1c, sim_out_0c)
 #'

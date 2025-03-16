@@ -8,8 +8,7 @@
 #' The control function provides options to set the memory of each remote node, number of cpus used by each remote node, and computation approach (whether or not use the nested parallel computation or local multiprocess with parallel computation).
 #' @param memory Numeric. Memory allocation for the remote workers.
 #' @param local_se Bool. True for calculating SE using local multiprocess in remote workers. This is only useful when clmq_se = TRUE.
-#' @param clmq_se Bool. True for using parallel computation via clustermq. This can be combined with local_se to calculate SE with nested parallel computation and
-#' local multiprocess. False for calculating SE in remote workers without nested parallel computation and local multiprocess.
+#' @param clmq_se Bool. True for using parallel computation (nested or local) via clustermq. This can be combined with local_se to calculate SE with nested parallel computation or local multiprocess. Nested parallel computation means double parallel computations -- each worker will do a parallel computation for \link[bunsen]{simulate_counterfactuals}. False for calculating SE only in remote workers without nested parallel computation and local multiprocess.
 #' @param clmq_hr Bool. True for calculating point estimate (marginal HR) using parallel computation via clustermq.
 #' @param clmq_local Bool. True for calculating point estimate (marginal HR) using local multiprocess in remote workers. This is only useful when clmq_hr = TRUE.
 #' @param n_jobs Numeric. Number of remote workers via clustermq.
@@ -34,7 +33,7 @@
 #' #
 #' }
 #'
-clmqControl <- function(memory = 1024 * 32, local_se = FALSE, clmq_se = FALSE, clmq_hr = TRUE, clmq_local = TRUE, n_jobs = 100, local_cores = 1) {
+clmqControl <- function(memory = 1024 * 32, local_se = FALSE, clmq_se = FALSE, clmq_hr = TRUE, clmq_local = FALSE, n_jobs = 100, local_cores = 1) {
   return(structure(
     list(
       memory = memory, local_se = local_se, clmq_se = clmq_se,

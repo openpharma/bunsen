@@ -4,26 +4,26 @@
 \alias{rmst_delta}
 \title{Calculate the variance of the marginal restricted mean survival time (RMST) when adjusting covariates using the delta method}
 \usage{
-rmst_delta(fit, time, arm, covariates, tau, surv0, surv1, cumhaz0, cumhaz1)
+rmst_delta(fit, time, trt, covariates, tau, surv0, surv1, cumhaz0, cumhaz1)
 }
 \arguments{
-\item{fit}{A \link[survival]{coxph} object with strata(arm) in the model. See example.}
+\item{fit}{A \link[survival]{coxph} object with strata(trt) in the model. See example.}
 
 \item{time}{A vector containing the event time of the sample.}
 
-\item{arm}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
+\item{trt}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
 
 \item{covariates}{A data frame containing the covariates.}
 
 \item{tau}{Numeric. A value for the restricted time or the pre-specified cutoff time point.}
 
-\item{surv0}{A vector containing the cumulative survival function for the placebo group or arm0.}
+\item{surv0}{A vector containing the cumulative survival function for the placebo group or trt0.}
 
-\item{surv1}{A vector containing the cumulative survival function for the treatment group or arm1.}
+\item{surv1}{A vector containing the cumulative survival function for the treatment group or trt1.}
 
-\item{cumhaz0}{A data frame containing the cumulative hazard function for the placebo group or arm0.}
+\item{cumhaz0}{A data frame containing the cumulative hazard function for the placebo group or trt0.}
 
-\item{cumhaz1}{A data frame containing the cumulative hazard function for the placebo group or arm1.}
+\item{cumhaz1}{A data frame containing the cumulative hazard function for the placebo group or trt1.}
 }
 \value{
 A value of the SE.
@@ -39,19 +39,21 @@ We used the delta estimation from Zucker (1998) but we also included an addition
 }
 \examples{
 library(survival)
-data('oak')
+data("oak")
 
-tau=26
-time=oak$OS
-status=oak$os.status
-arm=oak$trt
-covariates=oak[,c("btmb","pdl1")]
+tau <- 26
+time <- oak$OS
+status <- oak$os.status
+trt <- oak$trt
+covariates <- oak[, c("btmb", "pdl1")]
 
-dt=as.data.frame(cbind(time,status, arm, covariates))
-fit=coxph(Surv(time, status) ~ btmb+pdl1+strata(arm),data = dt)
-delta=rmst_point_estimate(fit,dt=dt,tau)
-rmst_delta(fit,time, arm, covariates,tau,surv0=delta$surv0,surv1=delta$surv1,
-cumhaz0=delta$cumhaz0,cumhaz1=delta$cumhaz1)
+dt <- as.data.frame(cbind(time, status, trt, covariates))
+fit <- coxph(Surv(time, status) ~ btmb + pdl1 + strata(trt), data = dt)
+delta <- rmst_point_estimate(fit, dt = dt, tau)
+rmst_delta(fit, time, trt, covariates, tau,
+  surv0 = delta$surv0, surv1 = delta$surv1,
+  cumhaz0 = delta$cumhaz0, cumhaz1 = delta$cumhaz1
+)
 }
 \references{
 \itemize{

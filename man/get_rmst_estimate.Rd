@@ -7,7 +7,7 @@
 get_rmst_estimate(
   time,
   status,
-  arm,
+  trt,
   covariates = NULL,
   tau,
   SE = "delta",
@@ -19,7 +19,7 @@ get_rmst_estimate(
 
 \item{status}{A vector containing the survival status of the sample.}
 
-\item{arm}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
+\item{trt}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
 
 \item{covariates}{A data frame containing the covariates. If covariates is NULL, unadjusted RMST is returned.}
 
@@ -42,13 +42,13 @@ estimating the marginal RMST when adjusting covariates. For the SE, both nonpara
 }
 \examples{
 
-data('oak')
-tau=26
-time=oak$OS
-status=oak$os.status
-arm=oak$trt
-covariates=oak[,c("btmb","pdl1")]
-get_rmst_estimate(time, status, arm, covariates,tau,SE='delta')
+data("oak")
+tau <- 26
+time <- oak$OS
+status <- oak$os.status
+trt <- oak$trt
+covariates <- oak[, c("btmb", "pdl1")]
+get_rmst_estimate(time, status, trt, covariates, tau, SE = "delta")
 
 }
 \references{

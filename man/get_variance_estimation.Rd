@@ -49,12 +49,16 @@ This can also get you the SE or variance estimates. If you only run this functio
 \examples{
 \dontrun{
 library(survival)
-data('oak')
+data("oak")
 
-cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
-get_variance_estimation(cox_event,cox_censor,trt='trt',data=oak,
-M=1000,n.boot=10,control=clmqControl(),cpp=FALSE)
+cox_event <- coxph(Surv(OS, os.status) ~ trt + btmb + pdl1, data = oak)
+#
+cox_censor <- coxph(Surv(OS, 1 - os.status) ~ trt + btmb + pdl1, data = oak)
+#
+get_variance_estimation(cox_event, cox_censor,
+  trt = "trt", data = oak,
+  M = 1000, n.boot = 10, control = clmqControl(), cpp = FALSE
+)
 }
 }
 \references{

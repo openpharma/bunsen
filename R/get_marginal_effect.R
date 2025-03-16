@@ -62,13 +62,135 @@ get_marginal_effect <- function(trt, cox_event, cox_censor, data, M, SE = TRUE, 
     control = control
   )
 
+  ret <- list(
+    trt=trt,
+    cox_event=cox_event,
+    cox_censor=cox_censor,
+    data=data,
+    M=M,
+    seed=seed,
+    cpp=cpp,
+    control=control,
+    beta=output
+  )
+
   if (SE) {
     SE <- get_variance_estimation(
       trt = trt, data = data, M = M, n.boot = n.boot, cpp = cpp, control = control,
       cox_event = cox_event, cox_censor = cox_censor, seed = seed
     )
-    output <- c(beta = output, SE)
+    ret$SE=SE
+  }else{ret$SE=NA}
+
+  class(ret) <- c('marginal_cox','bunsen')
+
+  return(ret)
+}
+
+
+#' Summarizing the marginal treatment effects for hazard ratio (HR)
+#'
+#' summary method for class 'marginal_cox'.
+#'
+#' @param object an object of class 'marginal_cox'
+#' @param ... Parameters for other methods.
+#' @importFrom stats pnorm
+#' @keywords internal
+#' @export
+summary.marginal_cox <- function(object,...){
+  tmp=summary(object$cox_event)$coefficients
+  e_cox=tmp[rownames(tmp)=='trt',]
+  z_value <- ifelse(length(object$SE>1), as.numeric(object$beta / object$SE[1]),NA)
+  p_value <- ifelse(length(object$SE>1),as.numeric(2 * (1 - pnorm(abs(z_value)))),NA)
+  ret=structure(list(
+    trt=object$trt,
+    formula=object$cox_event$formula,
+    original_cox=e_cox,
+    M=object$M,
+    N=nrow(object$data),
+    nevent=object$cox_event$nevent,
+    nevent_c=object$cox_censor$nevent,
+    seed=object$seed,
+    coef=object$beta,
+    SE=object$SE,
+    z_value=z_value,
+    p_value=p_value
+
+  ),class='summary_marginal_cox')
+  invisible(ret)
+}
+
+
+#' Print the summary of marginal treatment effects for hazard ratio (HR)
+#'
+#' print method for class 'summary_marginal_cox'.
+#'
+#' @param x an object of class 'summary_marginal_cox'
+#' @param ... Parameters for other methods.
+#' @keywords internal
+#' @export
+print.summary_marginal_cox <- function(x,...){
+
+  if(inherits(x,'summary_marginal_cox')){
+    cat('Call:\n')
+    print(x$formula)
+    cat('Marginal treatment effect calculated by N =',x$M,'simulations\n')
+    cat('Treatment variable:',x$trt,'------ Number of sample:',x$N,'\n')
+    cat('Number of events in cox_event:',x$nevent,'\n')
+    cat('Number of events in cox_censor:',x$nevent_c,'\n')
+    cat('Random seed = ',x$seed,'\n')
+    cat('Original treatment effect:\n')
+    cat(sprintf("%-10s  %-10s  %-10s  %-10s  %-10s  %-10s\n",'','coef','exp(coef)','se(coef)','z','Pr(>|z|)'))
+    cat(sprintf("%-10s  %-10f  %-10f  %-10f  %-10f  %-10f\n",
+                x$trt,x$original_cox['coef'],x$original_cox['exp(coef)'],x$original_cox['se(coef)'],x$original_cox['z'],x$original_cox['Pr(>|z|)']))
+    cat('Marginal treatment effect:\n')
+    cat(sprintf("%-10s  %-10s  %-10s  %-10s  %-10s  %-10s\n",'','coef','exp(coef)','se(coef)','z','Pr(>|z|)'))
+    cat(sprintf("%-10s  %-10f  %-10f  %-10f  %-10f  %-10f\n",x$trt,x$coef,exp(x$coef),x$SE[1],x$z_value,x$p_value))
+    cat('95% CI of Marginal treatment effect (bootstrap):',sprintf('%.3f %s %.3f',x$SE[2],',',x$SE[3]))
+
   }
 
-  return(output)
 }
+
+
+#' Print the marginal treatment effects for hazard ratio (HR)
+#'
+#' print method for class 'marginal_cox'.
+#'
+#' @param x an object of class 'marginal_cox'
+#' @param ... Parameters for other methods.
+#' @keywords internal
+#' @export
+print.marginal_cox <- function(x,...){
+
+  if(inherits(x,'marginal_cox')){
+    cat('Call:\n')
+    print(x$cox_event$formula)
+    cat('Marginal treatment effect calculated by N =',x$M,'simulations\n')
+    cat('Number of sample:',nrow(x$data),'\n')
+    cat(sprintf("%-10s  %-10s  %-10s  %-10s  %-10s  %-10s\n",'','coef','exp(coef)','se(coef)','2.5%','97.5%'))
+    cat(sprintf("%-10s  %-10f  %-10f  %-10f  %-10f  %-10f\n",x$trt,x$beta,exp(x$beta),x$SE[1],x$SE[2],x$SE[3]))
+    if(x$control$clmq_hr) cat('clustermq setting:\n','number of remote workers = ',x$control$n_jobs,', each worker has',x$control$local_cores,'core(s)\n')
+    cat('Point estimate:',ifelse(x$control$clmq_hr,
+                                 ifelse(x$control$clmq_local,
+                                        'parallel computation (clustermq) with local multiprocess\n',
+                                        'parallel computation (clustermq)\n'),
+                                 'local environment\n'))
+    if(length(x$SE)>1){
+      cat('SE (bootstrap):',ifelse(x$control$clmq_se,
+                                   ifelse(x$control$local_se,
+                                          'parallel computation (clustermq) with local multiprocess',
+                                          'nested parallel computation (clustermq)'),
+                                   'parallel computation\n'))
+      cat('95%CI estimated by bootstrap\n')
+    }else{
+      cat('SE: Not estimated\n')
+    }
+
+
+  }
+
+}
+
+
+

@@ -26,20 +26,25 @@ The event indicator from this function uses the equation 10', I(Y0<Y0_cens) or I
 }
 \examples{
 library(survival)
-data('oak')
+data("oak")
 
-cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
+cox_event <- coxph(Surv(OS, os.status) ~ trt + btmb + pdl1, data = oak)
+#
+cox_censor <- coxph(Surv(OS, 1 - os.status) ~ trt + btmb + pdl1, data = oak)
 bh <- basehaz(cox_event, centered = FALSE)
 bh_c <- basehaz(cox_censor, centered = FALSE)
-s_condi=calculate_statistics(model=cox_event,trt='trt')
-s_condi_c=calculate_statistics(model=cox_censor,trt='trt')
-sim_out_1d=simulate_counterfactuals(bh=bh,surv_cond = s_condi$surv_cond1,cpp=FALSE,M=1000)
-sim_out_0d=simulate_counterfactuals(bh=bh,surv_cond = s_condi$surv_cond0,cpp=FALSE,M=1000)
-sim_out_1c=simulate_counterfactuals(bh=bh_c,surv_cond = s_condi_c$surv_cond1,cpp=FALSE,M=1000)
-sim_out_0c=simulate_counterfactuals(bh=bh_c,surv_cond = s_condi_c$surv_cond0,cpp=FALSE,M=1000)
+s_condi <- calculate_statistics(model = cox_event, trt = "trt")
+s_condi_c <- calculate_statistics(model = cox_censor, trt = "trt")
+sim_out_1d <- simulate_counterfactuals(
+bh = bh, surv_cond = s_condi$surv_cond1, cpp = FALSE, M = 1000)
+sim_out_0d <- simulate_counterfactuals(
+bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
+sim_out_1c <- simulate_counterfactuals(
+bh = bh_c, surv_cond = s_condi_c$surv_cond1, cpp = FALSE, M = 1000)
+sim_out_0c <- simulate_counterfactuals(
+bh = bh_c, surv_cond = s_condi_c$surv_cond0, cpp = FALSE, M = 1000)
 
-output=calculate_trt_effect(sim_out_1d,sim_out_0d,sim_out_1c,sim_out_0c)
+output <- calculate_trt_effect(sim_out_1d, sim_out_0d, sim_out_1c, sim_out_0c)
 
 }
 \references{

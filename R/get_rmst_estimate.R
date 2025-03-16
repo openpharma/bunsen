@@ -10,7 +10,7 @@
 #'
 #' @param time A vector containing the event time of the sample.
 #' @param status A vector containing the survival status of the sample.
-#' @param arm A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.
+#' @param trt A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.
 #' @param covariates A data frame containing the covariates. If covariates is NULL, unadjusted RMST is returned.
 #' @param tau Numeric. A value for the restricted time or the pre-specified cutoff time point.
 #' @param SE Character. If SE = 'boot', SE was estimated using nonparametric bootstrap. If 'delta', SE was estimated using the delta method. Default is 'delta'.
@@ -33,23 +33,25 @@
 #' tau <- 26
 #' time <- oak$OS
 #' status <- oak$os.status
-#' arm <- oak$trt
+#' trt <- oak$trt
 #' covariates <- oak[, c("btmb", "pdl1")]
-#' get_rmst_estimate(time, status, arm, covariates, tau, SE = "delta")
+#' get_rmst_estimate(time, status, trt, covariates, tau, SE = "delta")
 #'
-get_rmst_estimate <- function(time, status, arm, covariates = NULL, tau, SE = "delta", n.boot = 1000) {
-  tau_max <- min(max(time[arm == 0]), max(time[arm == 1]))
+get_rmst_estimate <- function(time, status, trt, covariates = NULL, tau, SE = "delta", n.boot = 1000) {
+  tau_max <- min(max(time[trt == 0]), max(time[trt == 1]))
   if (tau > tau_max) stop(sprintf(c("The maximum tau of current sampe is ", round(tau_max, 3), ". Please choose a reasonable tau.")), call. = FALSE)
   if (tau <= 0) stop(sprintf(c("Tau should be greater than 0!")), call. = FALSE)
 
   if (is.null(covariates)) {
-    results <- rmst_unadjust(time, status, arm, tau)
+    results <- rmst_unadjust(time, status, trt, tau)
   } else {
     covariates <- as.data.frame(covariates)
 
-    dt <- as.data.frame(cbind(time, status, arm, covariates))
+    dt <- as.data.frame(cbind(time, status, trt, covariates))
 
-    fit <- coxph(as.formula(paste0("Surv(time, status) ~ ", paste(names(covariates), collapse = "+"), "+strata(arm)")), data = dt)
+    f <- as.formula(paste0("Surv(time, status) ~ ", paste(names(covariates), collapse = "+"), "+strata(trt)"))
+
+    fit <- coxph(f, data = dt)
 
     delta <- rmst_point_estimate(fit, dt = dt, tau)
 
@@ -63,11 +65,12 @@ get_rmst_estimate <- function(time, status, arm, covariates = NULL, tau, SE = "d
       ub <- quantile(out$t, prob = .975, na.rm = T)
       out <- c(SE = se, lb, ub)
     } else if (SE == "delta") {
-      out <- rmst_delta(fit, time, arm, covariates, tau, surv0 = delta$surv0, surv1 = delta$surv1, cumhaz0 = delta$cumhaz0, cumhaz1 = delta$cumhaz1)
+      out <- rmst_delta(fit, time, trt, covariates, tau, surv0 = delta$surv0, surv1 = delta$surv1, cumhaz0 = delta$cumhaz0, cumhaz1 = delta$cumhaz1)
       out <- c(SE = out, `2.5%` = output - 1.96 * out, `97.5%` = output + 1.96 * out)
+      n.boot=NA
     }
 
-    results <- list(RMST = output, SE = out)
+    results <- structure(list(formula=f,RMST = output, SE = out,tau=tau,SE_type=SE,n.boot=n.boot),class=c('rmst_bunsen'))
   }
 
   return(results)
@@ -85,4 +88,28 @@ get_rmst_estimate <- function(time, status, arm, covariates = NULL, tau, SE = "d
     output <- out$output
   }
   return(output)
+}
+
+
+#' Print the marginal restricted mean survival time (RMST)
+#'
+#' print method for class 'rmst_bunsen'.
+#'
+#' @param x an object of class 'rmst_bunsen'
+#' @param ... Parameters for other methods.
+#' @keywords internal
+#' @export
+print.rmst_bunsen <- function(x,...){
+  if(inherits(x,'rmst_bunsen')){
+
+    cat('Call:\n')
+    cat(deparse(x$formula), "\n")
+    cat('Restricted survival time:',x$tau,'\n')
+    cat(sprintf("%-10s  %-10s  %-10s  %-10s  %-10s\n",'','coef','se(coef)','2.5%','97.5%'))
+    cat(sprintf("%-10s  %-10f  %-10f  %-10f  %-10f\n",'trt',x$RMST,x$SE[1],x$SE[2],x$SE[3]))
+    cat('Method for SE calculation:',x$SE_type)
+    if(x$SE_type=='boot') cat('Number of bootstrap:',x$n.boot)
+  }
+
+
 }

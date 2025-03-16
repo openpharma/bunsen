@@ -38,7 +38,7 @@
 #' #
 #' get_point_estimate(
 #'   trt = "trt", cox_event = cox_event, cox_censor, M = 1000, data = oak,
-#'   seed = 1, cpp = FALSE, control = clmqControl()
+#'   seed = 1, cpp = FALSE, control = clmqControl(clmq_hr=FALSE)
 #' )
 get_point_estimate <- function(trt, cox_event, cox_censor, data, M = 1000, seed = NULL, cpp = TRUE,
                                control = clmqControl()) {

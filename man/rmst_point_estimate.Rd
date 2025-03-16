@@ -7,9 +7,9 @@
 rmst_point_estimate(fit, dt, tau)
 }
 \arguments{
-\item{fit}{A \link[survival]{coxph} object with strata(arm) in the model. See example.}
+\item{fit}{A \link[survival]{coxph} object with strata(trt) in the model. See example.}
 
-\item{dt}{A data frame used for the fit - coxph model including survival time, OS status, arm, and covariates.}
+\item{dt}{A data frame used for the fit - coxph model including survival time, OS status, trt, and covariates.}
 
 \item{tau}{Numeric. A value for the restricted time or the pre-specified cutoff time point.}
 }
@@ -32,17 +32,16 @@ estimating the marginal RMST when adjusting covariates.
 }
 \examples{
 library(survival)
-data('oak')
+data("oak")
 
-tau=26
-time=oak$OS
-status=oak$os.status
-arm=oak$trt
-covariates=oak[,c("btmb","pdl1")]
-
-dt=as.data.frame(cbind(time,status, arm, covariates))
-fit=coxph(Surv(time, status) ~ btmb+pdl1+strata(arm),data = dt)
-delta=rmst_point_estimate(fit,dt=dt,tau)
+tau <- 26
+time <- oak$OS
+status <- oak$os.status
+trt <- oak$trt
+covariates <- oak[, c("btmb", "pdl1")]
+dt <- as.data.frame(cbind(time, status, trt, covariates))
+fit <- coxph(Surv(time, status) ~ btmb + pdl1 + strata(trt), data = dt)
+delta <- rmst_point_estimate(fit, dt = dt, tau)
 delta$output
 }
 \references{

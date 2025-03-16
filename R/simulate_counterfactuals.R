@@ -34,7 +34,8 @@
 
 #' bh <- basehaz(cox_event, centered = FALSE)
 #' s_condi <- calculate_statistics(model = cox_event, trt = "trt")
-#' sim_out_1d <- simulate_counterfactuals(bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
+#' sim_out_1d <- simulate_counterfactuals(
+#' bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
 simulate_counterfactuals <- function(bh, surv_cond, M, cpp, loadcpp = TRUE) {
   if (cpp) {
     if (loadcpp) sourceCpp("./src/cpp_functions.cpp")

@@ -8,15 +8,15 @@
 #' Restricted mean survival time is a measure of average survival time up to a specified time point. We adopted the methods from Karrison et al.(2018) for
 #' estimating the marginal RMST when adjusting covariates. For the SE, both nonparametric bootstrap and delta method are good for estimation.
 #' We used the delta estimation from Zucker (1998) but we also included an additional variance component which treats the covariates as random as described in Chen and Tsiatis (2001).
-#' @param fit A \link[survival]{coxph} object with strata(arm) in the model. See example.
+#' @param fit A \link[survival]{coxph} object with strata(trt) in the model. See example.
 #' @param time A vector containing the event time of the sample.
-#' @param arm A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.
+#' @param trt A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.
 #' @param covariates A data frame containing the covariates.
 #' @param tau Numeric. A value for the restricted time or the pre-specified cutoff time point.
-#' @param surv0 A vector containing the cumulative survival function for the placebo group or arm0.
-#' @param surv1 A vector containing the cumulative survival function for the treatment group or arm1.
-#' @param cumhaz0 A data frame containing the cumulative hazard function for the placebo group or arm0.
-#' @param cumhaz1 A data frame containing the cumulative hazard function for the placebo group or arm1.
+#' @param surv0 A vector containing the cumulative survival function for the placebo group or trt0.
+#' @param surv1 A vector containing the cumulative survival function for the treatment group or trt1.
+#' @param cumhaz0 A data frame containing the cumulative hazard function for the placebo group or trt0.
+#' @param cumhaz1 A data frame containing the cumulative hazard function for the placebo group or trt1.
 #'
 #' @return A value of the SE.
 #'
@@ -34,42 +34,42 @@
 #' tau <- 26
 #' time <- oak$OS
 #' status <- oak$os.status
-#' arm <- oak$trt
+#' trt <- oak$trt
 #' covariates <- oak[, c("btmb", "pdl1")]
 #'
-#' dt <- as.data.frame(cbind(time, status, arm, covariates))
-#' fit <- coxph(Surv(time, status) ~ btmb + pdl1 + strata(arm), data = dt)
+#' dt <- as.data.frame(cbind(time, status, trt, covariates))
+#' fit <- coxph(Surv(time, status) ~ btmb + pdl1 + strata(trt), data = dt)
 #' delta <- rmst_point_estimate(fit, dt = dt, tau)
-#' rmst_delta(fit, time, arm, covariates, tau,
+#' rmst_delta(fit, time, trt, covariates, tau,
 #'   surv0 = delta$surv0, surv1 = delta$surv1,
 #'   cumhaz0 = delta$cumhaz0, cumhaz1 = delta$cumhaz1
 #' )
-rmst_delta <- function(fit, time, arm, covariates, tau, surv0, surv1, cumhaz0, cumhaz1) {
+rmst_delta <- function(fit, time, trt, covariates, tau, surv0, surv1, cumhaz0, cumhaz1) {
 
   sigma <- fit$var * fit$n
 
-  t0 <- time[arm == 0]
+  t0 <- time[trt == 0]
 
-  t1 <- time[arm == 1]
+  t1 <- time[trt == 1]
 
   n0 <- length(t0)
 
   n1 <- length(t1)
 
-  x0 <- covariates[arm == 0, ]
+  x0 <- covariates[trt == 0, ]
 
-  x1 <- covariates[arm == 1, ]
+  x1 <- covariates[trt == 1, ]
 
-  # arm 0
+  # trt 0
   s0_c <- rep(0, length(cumhaz0$time))
 
   s1_c <- matrix(0, nrow = length(cumhaz0$time), ncol = ncol(x0))
 
   zb <- predict(fit, type = "lp", reference = "zero")
 
-  zb0 <- zb[arm == 0]
+  zb0 <- zb[trt == 0]
 
-  zb1 <- zb[arm == 1]
+  zb1 <- zb[trt == 1]
 
   for (i in 1:length(cumhaz0$time)) {
     s0_c[i] <- sum((t0 >= cumhaz0$time[i]) * exp(zb0)) / n0
@@ -127,7 +127,7 @@ rmst_delta <- function(fit, time, arm, covariates, tau, surv0, surv1, cumhaz0, c
 
   var_c2 <- mean((AUC_c - mean(AUC_c))^2)
 
-  # arm 1
+  # trt 1
   s0_t <- rep(0, length(cumhaz1$time))
 
   s1_t <- matrix(0, nrow = length(cumhaz1$time), ncol = ncol(x1))

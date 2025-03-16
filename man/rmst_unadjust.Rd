@@ -4,23 +4,23 @@
 \alias{rmst_unadjust}
 \title{Calculate the unadjusted restricted mean survival time (RMST)}
 \usage{
-rmst_unadjust(time, status, arm, tau)
+rmst_unadjust(time, status, trt, tau)
 }
 \arguments{
 \item{time}{A vector containing the event time of the sample.}
 
 \item{status}{A vector containing the survival status of the sample.}
 
-\item{arm}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
+\item{trt}{A vector indicating the treatment assignment. 1 for treatment group. 0 for placebo group.}
 
 \item{tau}{Numeric. A value for the restricted time or the pre-specified cutoff time point.}
 }
 \value{
-A data frame including the survival time for each arm and the difference. SE were also calculated.
+A data frame including the survival time for each trt and the difference. SE were also calculated.
 \describe{
-\item{mu0}{Mean survival time for arm0}
+\item{mu0}{Mean survival time for trt0}
 \item{se0}{SE of mu0}
-\item{mu1}{Mean survival time for arm1}
+\item{mu1}{Mean survival time for trt1}
 \item{se1}{SE of mu1}
 \item{delta}{Difference between mu0 and mu1}
 \item{se_d}{SE of delta}
@@ -31,12 +31,12 @@ Estimate the unadjusted RMST (point estimate).
 }
 \examples{
 
-data('oak')
-tau=26
-time=oak$OS
-status=oak$os.status
-arm=oak$trt
-covariates=oak[,c("btmb","pdl1")]
-results=rmst_unadjust(time,status,arm,tau)
+data("oak")
+tau <- 26
+time <- oak$OS
+status <- oak$os.status
+trt <- oak$trt
+covariates <- oak[, c("btmb", "pdl1")]
+results <- rmst_unadjust(time, status, trt, tau)
 
 }

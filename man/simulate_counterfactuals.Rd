@@ -30,14 +30,16 @@ suggest to use C++ optimization to speed up the calculation.
 }
 \examples{
 library(survival)
-data('oak')
+data("oak")
 
-cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
+cox_event <- coxph(Surv(OS, os.status) ~ trt + btmb + pdl1, data = oak)
+#
+cox_censor <- coxph(Surv(OS, 1 - os.status) ~ trt + btmb + pdl1, data = oak)
 
 bh <- basehaz(cox_event, centered = FALSE)
-s_condi=calculate_statistics(model=cox_event,trt='trt')
-sim_out_1d=simulate_counterfactuals(bh=bh,surv_cond = s_condi$surv_cond0,cpp=FALSE,M=1000)
+s_condi <- calculate_statistics(model = cox_event, trt = "trt")
+sim_out_1d <- simulate_counterfactuals(
+bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
 }
 \references{
 Daniel R, Zhang J, Farewell D. Making apples from oranges:

@@ -28,11 +28,10 @@ is S(t2)∕S(t1), and so on. This function returns the S(t2)/S(t1) in series.
 }
 \examples{
 library(survival)
-data('oak')
+data("oak")
 
-cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
-calculate_statistics(model=cox_event,trt='trt')
-
+cox_event <- coxph(Surv(OS, os.status) ~ trt + btmb + pdl1, data = oak)
+calculate_statistics(model = cox_event, trt = "trt")
 
 }
 \references{
