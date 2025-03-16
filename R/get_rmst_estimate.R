@@ -15,6 +15,7 @@
 #' @param tau Numeric. A value for the restricted time or the pre-specified cutoff time point.
 #' @param SE Character. If SE = 'boot', SE was estimated using nonparametric bootstrap. If 'delta', SE was estimated using the delta method. Default is 'delta'.
 #' @param n.boot Numeric. Number of bootstrap used. Only used if SE = 'boot'.
+#' @param seed Numeric. Random seed for bootstrap. Default:1.
 #'
 #' @return A list including marginal RMST and SE.
 #'
@@ -36,8 +37,8 @@
 #' trt <- oak$trt
 #' covariates <- oak[, c("btmb", "pdl1")]
 #' get_rmst_estimate(time, status, trt, covariates, tau, SE = "delta")
-#'
-get_rmst_estimate <- function(time, status, trt, covariates = NULL, tau, SE = "delta", n.boot = 1000) {
+
+get_rmst_estimate <- function(time, status, trt, covariates = NULL, tau, SE = "delta", n.boot = 1000,seed=1){
   tau_max <- min(max(time[trt == 0]), max(time[trt == 1]))
   if (tau > tau_max) stop(sprintf(c("The maximum tau of current sampe is ", round(tau_max, 3), ". Please choose a reasonable tau.")), call. = FALSE)
   if (tau <= 0) stop(sprintf(c("Tau should be greater than 0!")), call. = FALSE)
@@ -51,14 +52,17 @@ get_rmst_estimate <- function(time, status, trt, covariates = NULL, tau, SE = "d
 
     f <- as.formula(paste0("Surv(time, status) ~ ", paste(names(covariates), collapse = "+"), "+strata(trt)"))
 
-    fit <- coxph(f, data = dt)
+    fit <- coxph(as.formula(paste0("Surv(time, status) ~ ", paste(names(covariates), collapse = "+"), "+strata(trt)")), data = dt)
 
     delta <- rmst_point_estimate(fit, dt = dt, tau)
 
     output <- delta$output
 
     if (SE == "boot") {
-      out <- boot(data = dt, .rmst_boot_fx, R = n.boot, fit = fit, tau = tau, covariates = covariates)
+      set.seed(seed)
+      try(suppressWarnings({
+        out <- boot(data = dt, .rmst_boot_fx, R = n.boot, fit = fit, tau = tau, covariates = covariates)
+      }),silent = TRUE)
 
       se <- sd(out$t, na.rm = T)
       lb <- quantile(out$t, prob = .025, na.rm = T)
@@ -70,11 +74,13 @@ get_rmst_estimate <- function(time, status, trt, covariates = NULL, tau, SE = "d
       n.boot=NA
     }
 
-    results <- structure(list(formula=f,RMST = output, SE = out,tau=tau,SE_type=SE,n.boot=n.boot),class=c('rmst_bunsen'))
+    results <- structure(list(formula=f,RMST = output, SE = out,tau=tau,SE_type=SE,n.boot=n.boot,seed=seed),class=c('rmst_bunsen'))
+  }
+  return(results)
   }
 
-  return(results)
-}
+
+
 
 .rmst_boot_fx <- function(data, idx, fit, tau, covariates) {
   fit_tmp <- update(fit, data = data[idx, ])
@@ -108,7 +114,7 @@ print.rmst_bunsen <- function(x,...){
     cat(sprintf("%-10s  %-10s  %-10s  %-10s  %-10s\n",'','coef','se(coef)','2.5%','97.5%'))
     cat(sprintf("%-10s  %-10f  %-10f  %-10f  %-10f\n",'trt',x$RMST,x$SE[1],x$SE[2],x$SE[3]))
     cat('Method for SE calculation:',x$SE_type)
-    if(x$SE_type=='boot') cat('Number of bootstrap:',x$n.boot)
+    if(x$SE_type=='boot') cat('Number of bootstrap:',x$n.boot,', random seed =',x$seed)
   }
 
 

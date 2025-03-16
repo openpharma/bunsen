@@ -11,7 +11,8 @@ get_rmst_estimate(
   covariates = NULL,
   tau,
   SE = "delta",
-  n.boot = 1000
+  n.boot = 1000,
+  seed = 1
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ get_rmst_estimate(
 \item{SE}{Character. If SE = 'boot', SE was estimated using nonparametric bootstrap. If 'delta', SE was estimated using the delta method. Default is 'delta'.}
 
 \item{n.boot}{Numeric. Number of bootstrap used. Only used if SE = 'boot'.}
+
+\item{seed}{Numeric. Random seed for bootstrap. Default:1.}
 }
 \value{
 A list including marginal RMST and SE.
@@ -49,7 +52,6 @@ status <- oak$os.status
 trt <- oak$trt
 covariates <- oak[, c("btmb", "pdl1")]
 get_rmst_estimate(time, status, trt, covariates, tau, SE = "delta")
-
 }
 \references{
 \itemize{

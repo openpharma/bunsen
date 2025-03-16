@@ -27,19 +27,45 @@ cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 
-get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak,seed = 1)
-
+model=get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak,seed = 1)
 # Calculating point estimate in local clustermq using multiprocess...
-# Starting 4 processes ...
-# Running 4 calculations (8 objs/120 Kb common; 1 calls/chunk) ...
-# Master: [11.6 secs 3.2% CPU]; Worker: [avg 15.7% CPU, max 305.1 Mb]                                                                                             
+# Submitting 4 worker jobs (ID: cmq7488) ...
+# Running 4 calculations (8 objs/120.1 Kb common; 1 calls/chunk) ...
+# Master: [8.6 secs 0.8% CPU]; Worker: [avg 19.1% CPU, max 303.9 Mb]                                                                                              
 # Calculating SE in clustermq using bootstrap N = 1000...
-# Submitting 100 worker jobs (ID: cmq7987) ...
-# Running 1,000 calculations (14 objs/354.1 Kb common; 1 calls/chunk) ...
-# Master: [21.3 secs 7.4% CPU]; Worker: [avg 32.9% CPU, max 307.7 Mb]                                                                                             
-#       beta         se       2.5%      97.5% 
-# -0.4429095  0.1039048 -0.6543062 -0.2454157 
+# Submitting 100 worker jobs (ID: cmq9642) ...
+# Running 1,000 calculations (14 objs/354.8 Kb common; 1 calls/chunk) ...
+# Master: [16.0 secs 8.4% CPU]; Worker: [avg 48.5% CPU, max 307.7 Mb] 
 
+model
+# Call:
+# Surv(OS, os.status) ~ trt + btmb + pdl1
+# Marginal treatment effect calculated by N = 10000 simulations
+# Number of sample: 578 
+#             coef        exp(coef)   se(coef)    2.5%        97.5%     
+# trt         -0.442910   0.642165    0.103905    -0.654306   -0.245416 
+# clustermq setting:
+#  number of remote workers =  100 , each worker has 1 core(s)
+# Point estimate: parallel computation (clustermq)
+# SE (bootstrap): parallel computation
+# 95%CI estimated by bootstrap
+
+summary(model)
+
+# Call:
+# Surv(OS, os.status) ~ trt + btmb + pdl1
+# Marginal treatment effect calculated by N = 10000 simulations
+# Treatment variable: trt ------ Number of sample: 578 
+# Number of events in cox_event: 423 
+# Number of events in cox_censor: 155 
+# Random seed =  1 
+# Original treatment effect:
+#             coef        exp(coef)   se(coef)    z           Pr(>|z|)  
+# trt         -0.452408   0.636095    0.098428    -4.596346   0.000004  
+# Marginal treatment effect:
+#             coef        exp(coef)   se(coef)    z           Pr(>|z|)  
+# trt         -0.442910   0.642165    0.103905    -4.262646   0.000020  
+# 95% CI of Marginal treatment effect (bootstrap): -0.654 , -0.245
 ```
 
 ### Marginal point estimate and variance of RMST for COX model
@@ -55,29 +81,30 @@ time=oak$OS
 
 status=oak$os.status
 
-arm=oak$trt
+trt=oak$trt
 
 covariates=oak[,c('btmb','pdl1')]
 
-get_rmst_est(time, status, arm, covariates,tau,SE='delta')
+result=get_rmst_estimate(time, status, trt, covariates, tau, SE = "delta")
 
-# $RMST
-# [1] 3.265971
-# 
-# $SE
-#       SE     2.5%    97.5% 
-# 0.716351 1.861923 4.670019 
+result
+# Call:
+# Surv(time, status) ~ btmb + pdl1 + strata(trt) 
+# Restricted survival time: 26 
+#             coef        se(coef)    2.5%        97.5%     
+# trt         3.265971    0.716351    1.861923    4.670019  
+# Method for SE calculation: delta
 
-set.seed(2024)
+result=get_rmst_estimate(time, status, trt, covariates, tau, SE = "boot", seed = 2025)
 
-get_rmst_est(time, status, arm, covariates,tau,SE='boot',n.boot = 1000)
+result
 
-# $RMST
-# [1] 3.265971
-# 
-# $SE
-#       SE     2.5%    97.5% 
-# 0.736598 1.800280 4.714082 
+# Call:
+# Surv(time, status) ~ btmb + pdl1 + strata(trt) 
+# Restricted survival time: 26 
+#             coef        se(coef)    2.5%        97.5%     
+# trt         3.265971    0.715191    1.994362    4.699867  
+# Method for SE calculation: bootNumber of bootstrap: 1000 , random seed = 2025
 ```
 ## Methodology
 

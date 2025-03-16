@@ -116,8 +116,8 @@ summary.marginal_cox <- function(object,...){
     z_value=z_value,
     p_value=p_value
 
-  ),class='summary_marginal_cox')
-  invisible(ret)
+  ),class='summary.marginal_cox')
+  return(ret)
 }
 
 
@@ -129,9 +129,9 @@ summary.marginal_cox <- function(object,...){
 #' @param ... Parameters for other methods.
 #' @keywords internal
 #' @export
-print.summary_marginal_cox <- function(x,...){
+print.summary.marginal_cox <- function(x,...){
 
-  if(inherits(x,'summary_marginal_cox')){
+  if(inherits(x,'summary.marginal_cox')){
     cat('Call:\n')
     print(x$formula)
     cat('Marginal treatment effect calculated by N =',x$M,'simulations\n')

@@ -2,7 +2,7 @@
 
 S3method(print,marginal_cox)
 S3method(print,rmst_bunsen)
-S3method(print,summary_marginal_cox)
+S3method(print,summary.marginal_cox)
 S3method(sanitize_coxmodel,coxph)
 S3method(sanitize_coxmodel,default)
 S3method(summary,marginal_cox)
