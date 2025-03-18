@@ -31,7 +31,7 @@ cox_event <- coxph(Surv(OS, os.status) ~ trt+btmb+pdl1, data=oak)
 
 cox_censor <- coxph(Surv(OS, 1-os.status) ~trt+btmb+pdl1, data=oak)
 
-model=get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak,seed = 1)
+result=get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak,seed = 1)
 # Calculating point estimate in local clustermq using multiprocess...
 # Submitting 4 worker jobs (ID: cmq7488) ...
 # Running 4 calculations (8 objs/120.1 Kb common; 1 calls/chunk) ...
@@ -41,7 +41,7 @@ model=get_marginal_effect(trt = 'trt',cox_event,cox_censor,M=10000,data=oak,seed
 # Running 1,000 calculations (14 objs/354.8 Kb common; 1 calls/chunk) ...
 # Master: [16.0 secs 8.4% CPU]; Worker: [avg 48.5% CPU, max 307.7 Mb] 
 
-model
+result
 # Call:
 # Surv(OS, os.status) ~ trt + btmb + pdl1
 # Marginal treatment effect calculated by N = 10000 simulations
@@ -54,7 +54,7 @@ model
 # SE (bootstrap): parallel computation
 # 95%CI estimated by bootstrap
 
-summary(model)
+summary(result)
 
 # Call:
 # Surv(OS, os.status) ~ trt + btmb + pdl1
