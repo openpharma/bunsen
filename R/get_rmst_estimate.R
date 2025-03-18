@@ -113,7 +113,7 @@ print.rmst_bunsen <- function(x,...){
     cat('Restricted survival time:',x$tau,'\n')
     cat(sprintf("%-10s  %-10s  %-10s  %-10s  %-10s\n",'','coef','se(coef)','2.5%','97.5%'))
     cat(sprintf("%-10s  %-10f  %-10f  %-10f  %-10f\n",'trt',x$RMST,x$SE[1],x$SE[2],x$SE[3]))
-    cat('Method for SE calculation:',x$SE_type)
+    cat('Method for SE calculation:',x$SE_type,'\n')
     if(x$SE_type=='boot') cat('Number of bootstrap:',x$n.boot,', random seed =',x$seed)
   }
 
