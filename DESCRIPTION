@@ -1,0 +1,55 @@
+Package: bunsen
+Title: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials
+Version: 0.1.0
+Authors@R: 
+  c(person(given = "Xinlei", 
+           family = "Deng", 
+           email = "xinlei.deng@novartis.com", 
+           role = c("cre", "aut"), 
+           comment = c(ORCID = "0000-0001-8129-6007")
+           ),
+    person(given = "Mark", 
+           family = "Baillie", 
+           email = "mark.baillie@novartis.com", 
+           role = c("aut"), 
+           comment = c(ORCID = "0000-0002-5618-0667")
+           ),
+    person(given = "Craig", 
+           family = "Wang", 
+           email = "craig.wang@novartis.com", 
+           role = c("aut"),
+           comment = c(ORCID = "0000-0003-1804-2463")
+           ),
+    person(given = "Dominic", 
+           family = "Magirr", 
+           email = "dominic.magirr@novartis.com", 
+           role = c("aut")
+           ),
+    person(given = "Alex", 
+           family = "Przybylski", 
+           email = "alexander.przybylski@novartis.com", 
+           role = c("aut")
+           ))
+Description: Provides an efficient and robust implementation for estimating marginal Hazard Ratio (HR) and 
+  Restricted Mean Survival Time (RMST) with covariate adjustment using Daniel et al (2021) <https://doi.org/10.1002/bimj.201900297> and 
+  Karrison et al (2018) <https://doi.org/10.1177/1740774518759281>.
+Maintainer: Xinlei Deng <xinlei.deng@novartis.com>
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Depends: 
+    R (>= 2.10)
+LazyData: true
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp
+Imports: 
+    stats,
+    survival,
+    boot,
+    clustermq,
+    Rcpp
+    
