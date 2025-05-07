@@ -11,7 +11,7 @@
 #' defined by the event times in the original data, at time t0 = 0, everyone in the simulated data is still a survivor.
 #' S(x) is the estimated survival function. By the end of the window (0,t1], a proportion S(t1) still survives.
 #' The conditional probability of surviving the next window, (t1,t2], conditional on surviving the first window,
-#' is S(t2)∕S(t1), and so on. This function returns the S(t2)/S(t1) in series.
+#' is S(t2)/S(t1), and so on. This function returns the S(t2)/S(t1) in series.
 #'
 #' @param model A fitted \link[survival]{coxph} model. This should be a coxph event model or censoring model.
 #' @param trt Character. Name of the treatment assignment variable.
