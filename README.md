@@ -121,10 +121,10 @@ bunsen is developed based on three key papers:
 ## Package authors
 
 -   Xinlei Deng (Maintainer)
+-   Mark Baillie
 -   Dominic Magirr
 -   Craig Wang
 -   Alexander Przybylski
--   Mark Baillie
 
 ## Acknowledgements
 
