@@ -16,6 +16,7 @@
 #' @param seed Numeric. Random seed for simulation.
 #' @param cpp Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.
 #' @param control Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.
+#' @param verbose Bool. Print status messages. Default: TRUE
 #'
 #' @return The marginal beta (logHR)
 #'
@@ -41,7 +42,7 @@
 #'   seed = 1, cpp = FALSE, control = clmqControl(clmq_hr=FALSE)
 #' )
 get_point_estimate <- function(trt, cox_event, cox_censor, data, M = 1000, seed = NULL, cpp = TRUE,
-                               control = clmqControl()) {
+                               control = clmqControl(),verbose=TRUE) {
 
   bh <- basehaz(cox_event, centered = FALSE)
 
@@ -63,7 +64,7 @@ get_point_estimate <- function(trt, cox_event, cox_censor, data, M = 1000, seed 
     if (is.null(seed)) seed <- Sys.time()
 
     if (control$clmq_local) options(clustermq.scheduler = "multiprocess")
-    cat("Calculating point estimate in local clustermq using multiprocess...\n")
+    if(verbose) cat("Calculating point estimate in local clustermq using multiprocess...\n")
 
     sim_dt <- Q(.fx_clsmq_simcoun,
       i_bh = c(1, 1, 2, 2), j_surv_cond = 1:4,
@@ -74,7 +75,7 @@ get_point_estimate <- function(trt, cox_event, cox_censor, data, M = 1000, seed 
       n_jobs = 4, memory = control$memory, seed = seed,
       export = list(
         simulate_counterfactuals = simulate_counterfactuals
-      ), template = list(cores = 1), pkgs = c("survival", "Rcpp")
+      ), template = list(cores = 1), pkgs = c("survival", "Rcpp"),verbose=verbose
     )
 
     output <- calculate_trt_effect(sim_out_1d = sim_dt[[1]], sim_out_0d = sim_dt[[2]], sim_out_1c = sim_dt[[3]], sim_out_0c = sim_dt[[4]])

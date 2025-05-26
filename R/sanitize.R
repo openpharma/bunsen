@@ -6,7 +6,7 @@
 #' @param model A coxph model from survival package.
 #' @param ... Parameters for other methods.
 #' @keywords internal
-#' @export
+
 sanitize_coxmodel <- function(model, ...) {
   UseMethod("sanitize_coxmodel")
 }
@@ -18,7 +18,7 @@ sanitize_coxmodel <- function(model, ...) {
 #' @param model A coxph model from survival package.
 #' @param ... Parameters for other methods.
 #' @keywords internal
-#' @export
+
 sanitize_coxmodel.default <- function(model, ...) {
   if (!inherits(model, "coxph")) {
     msg <- c(sprintf(
@@ -37,7 +37,7 @@ sanitize_coxmodel.default <- function(model, ...) {
 #' @param model A coxph model from survival package.
 #' @param trt Character. Name of the treatment assignment variable.
 #' @keywords internal
-#' @export
+
 sanitize_coxmodel.coxph <- function(model, trt, ...) {
   # check strata
 

@@ -37,7 +37,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' library(survival)
 #' data("oak")
 #'
@@ -96,7 +96,7 @@ get_marginal_effect <- function(trt, cox_event, cox_censor, data, M, SE = TRUE, 
 #' @param ... Parameters for other methods.
 #' @importFrom stats pnorm
 #' @keywords internal
-#' @export
+
 summary.marginal_cox <- function(object,...){
   tmp=summary(object$cox_event)$coefficients
   e_cox=tmp[rownames(tmp)=='trt',]
@@ -128,7 +128,7 @@ summary.marginal_cox <- function(object,...){
 #' @param x an object of class 'summary_marginal_cox'
 #' @param ... Parameters for other methods.
 #' @keywords internal
-#' @export
+
 print.summary.marginal_cox <- function(x,...){
 
   if(inherits(x,'summary.marginal_cox')){
@@ -160,7 +160,7 @@ print.summary.marginal_cox <- function(x,...){
 #' @param x an object of class 'marginal_cox'
 #' @param ... Parameters for other methods.
 #' @keywords internal
-#' @export
+
 print.marginal_cox <- function(x,...){
 
   if(inherits(x,'marginal_cox')){
