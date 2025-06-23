@@ -16,7 +16,7 @@ We introduce **bunsen** package for marginal HR and RMST estimation and variance
 
 ## Package architecture
 
-![](inst/bunsen.png)
+![](man/figures/bunsen.png)
 
 ## Example
 
