@@ -11,6 +11,9 @@
 
 \item{trt}{Character. Name of the treatment assignment variable.}
 }
+\value{
+No return value. This is called for its side effects.
+}
 \description{
 Check the covariates of the coxph model.
 }

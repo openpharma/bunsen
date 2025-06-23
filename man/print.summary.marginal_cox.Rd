@@ -11,6 +11,9 @@
 
 \item{...}{Parameters for other methods.}
 }
+\value{
+No return value. This is called for its side effects.
+}
 \description{
 print method for class 'summary_marginal_cox'.
 }

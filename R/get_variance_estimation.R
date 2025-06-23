@@ -30,7 +30,8 @@
 #' @importFrom stats as.formula coef model.frame na.omit predict quantile rbinom sd update var
 #' @importFrom utils data
 #' @examples
-#' \donttest{
+#' \dontrun{
+#' #Don't run as it requires LSF scheduler
 #' library(survival)
 #' data("oak")
 #'

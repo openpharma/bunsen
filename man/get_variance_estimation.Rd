@@ -13,7 +13,8 @@ get_variance_estimation(
   n.boot,
   seed = NULL,
   cpp = TRUE,
-  control = clmqControl()
+  control = clmqControl(),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ get_variance_estimation(
 \item{cpp}{Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.}
 
 \item{control}{Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.}
+
+\item{verbose}{Bool. Print status messages. Default: TRUE}
 }
 \value{
 A vector containing SE and 95\% CI.
@@ -48,6 +51,7 @@ This can also get you the SE or variance estimates. If you only run this functio
 }
 \examples{
 \dontrun{
+#Don't run as it requires LSF scheduler
 library(survival)
 data("oak")
 

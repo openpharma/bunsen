@@ -14,7 +14,8 @@ get_marginal_effect(
   seed = NULL,
   cpp = TRUE,
   n.boot = 1000,
-  control = clmqControl()
+  control = clmqControl(),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ get_marginal_effect(
 \item{n.boot}{Numeric. Number of bootstrap used.}
 
 \item{control}{Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.}
+
+\item{verbose}{Bool. Print status messages. Default: TRUE}
 }
 \value{
 A vector containing the marginal beta (logHR), standard error, and 95\% CI.
@@ -58,6 +61,8 @@ computation via LSF and remote parallel computation with local multiprocess.
 }
 \examples{
 \dontrun{
+#Don't run as it requires LSF scheduler
+
 library(survival)
 data("oak")
 

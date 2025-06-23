@@ -40,18 +40,21 @@ The control function provides options to set the memory of each remote node, num
 }
 \examples{
 \dontrun{
+#Don't run as it requires LSF scheduler
+
 library(survival)
 data("oak")
 
 cox_event <- coxph(Surv(OS, os.status) ~ trt + btmb + pdl1, data = oak)
-#
+
 cox_censor <- coxph(Surv(OS, 1 - os.status) ~ trt + btmb + pdl1, data = oak)
-#
+
+
 get_marginal_effect(
   trt = "trt", cox_event = cox_event, cox_censor = cox_censor, SE = TRUE,
   M = 1000, n.boot = 10, data = oak, seed = 1, cpp = FALSE, control = clmqControl()
 )
-#
-}
 
+
+}
 }
