@@ -103,6 +103,7 @@ get_rmst_estimate <- function(time, status, trt, covariates = NULL, tau, SE = "d
 #'
 #' @param x an object of class 'rmst_bunsen'
 #' @param ... Parameters for other methods.
+#' @return No return value. This is called for its side effects.
 #' @keywords internal
 #' @export
 print.rmst_bunsen <- function(x,...){

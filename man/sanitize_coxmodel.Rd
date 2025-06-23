@@ -11,6 +11,9 @@ sanitize_coxmodel(model, ...)
 
 \item{...}{Parameters for other methods.}
 }
+\value{
+No return value. This is called for its side effects.
+}
 \description{
 Check the coxph model fit including model class and covariates.
 See if the model is supported for estimating the marginal treatment effects.

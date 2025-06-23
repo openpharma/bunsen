@@ -4,7 +4,7 @@
 \name{bunsen-package}
 \alias{bunsen}
 \alias{bunsen-package}
-\title{bunsen: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials}
+\title{bunsen: Marginal Survival Estimation with Covariate Adjustment}
 \description{
 Provides an efficient and robust implementation for estimating marginal Hazard Ratio (HR) and Restricted Mean Survival Time (RMST) with covariate adjustment using Daniel et al. (2021) \doi{10.1002/bimj.201900297} and Karrison et al. (2018) \doi{10.1177/1740774518759281}.
 }

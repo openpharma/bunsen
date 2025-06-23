@@ -1,5 +1,5 @@
 Package: bunsen
-Title: Marginal Estimation with Covariate Adjustment for Survival Endpoint in Clinical Trials
+Title: Marginal Survival Estimation with Covariate Adjustment
 Version: 0.1.0
 Authors@R: 
   c(person(given = "Xinlei", 

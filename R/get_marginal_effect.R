@@ -25,7 +25,7 @@
 #' @param cpp Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.
 #' @param control Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.
 #' @param n.boot Numeric. Number of bootstrap used.
-
+#' @param verbose Bool. Print status messages. Default: TRUE
 #'
 #' @return A vector containing the marginal beta (logHR), standard error, and 95% CI.
 #'
@@ -38,6 +38,8 @@
 #'
 #' @examples
 #' \dontrun{
+#' #Don't run as it requires LSF scheduler
+#'
 #' library(survival)
 #' data("oak")
 #'
@@ -52,14 +54,14 @@
 #' #
 #' }
 get_marginal_effect <- function(trt, cox_event, cox_censor, data, M, SE = TRUE, seed = NULL, cpp = TRUE, n.boot = 1000,
-                                control = clmqControl()) {
+                                control = clmqControl(),verbose=TRUE) {
   sanitize_coxmodel(cox_event, trt)
   sanitize_coxmodel(cox_censor, trt)
 
 
   output <- get_point_estimate(
     trt = trt, cox_event = cox_event, cox_censor = cox_censor, data = data, M = M, seed = seed, cpp = cpp,
-    control = control
+    control = control,verbose=verbose
   )
 
   ret <- list(
@@ -77,7 +79,7 @@ get_marginal_effect <- function(trt, cox_event, cox_censor, data, M, SE = TRUE, 
   if (SE) {
     SE <- get_variance_estimation(
       trt = trt, data = data, M = M, n.boot = n.boot, cpp = cpp, control = control,
-      cox_event = cox_event, cox_censor = cox_censor, seed = seed
+      cox_event = cox_event, cox_censor = cox_censor, seed = seed,verbose=verbose
     )
     ret$SE=SE
   }else{ret$SE=NA}
@@ -94,6 +96,7 @@ get_marginal_effect <- function(trt, cox_event, cox_censor, data, M, SE = TRUE, 
 #'
 #' @param object an object of class 'marginal_cox'
 #' @param ... Parameters for other methods.
+#' @return No return value. This is called for its side effects.
 #' @importFrom stats pnorm
 #' @keywords internal
 #' @export
@@ -127,6 +130,7 @@ summary.marginal_cox <- function(object,...){
 #'
 #' @param x an object of class 'summary_marginal_cox'
 #' @param ... Parameters for other methods.
+#' @return No return value. This is called for its side effects.
 #' @keywords internal
 #' @export
 print.summary.marginal_cox <- function(x,...){
@@ -159,6 +163,7 @@ print.summary.marginal_cox <- function(x,...){
 #'
 #' @param x an object of class 'marginal_cox'
 #' @param ... Parameters for other methods.
+#' @return No return value. This is called for its side effects.
 #' @keywords internal
 #' @export
 print.marginal_cox <- function(x,...){

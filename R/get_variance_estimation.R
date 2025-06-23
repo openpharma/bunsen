@@ -15,6 +15,7 @@
 #' @param seed Numeric. Random seed for simulation.
 #' @param cpp Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.
 #' @param control Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.
+#' @param verbose Bool. Print status messages. Default: TRUE
 #' @return A vector containing SE and 95% CI.
 #'
 #' @references
@@ -30,6 +31,7 @@
 #' @importFrom utils data
 #' @examples
 #' \dontrun{
+#' #Don't run as it requires LSF scheduler
 #' library(survival)
 #' data("oak")
 #'
@@ -43,9 +45,9 @@
 #' )
 #' }
 get_variance_estimation <- function(cox_event, cox_censor, trt, data, M, n.boot, seed = NULL, cpp = TRUE,
-                                    control = clmqControl()) {
+                                    control = clmqControl(),verbose=TRUE) {
   if (is.null(seed)) seed <- Sys.time()
-  cat(paste0("Calculating SE in clustermq using bootstrap N = ", n.boot, "...\n"))
+  if(verbose) cat(paste0("Calculating SE in clustermq using bootstrap N = ", n.boot, "...\n"))
 
   options(clustermq.scheduler = "LSF")
 
@@ -66,7 +68,7 @@ get_variance_estimation <- function(cox_event, cox_censor, trt, data, M, n.boot,
       clmqControl = clmqControl,
       .fx_clsmq_simcoun = .fx_clsmq_simcoun
     ),
-    template = list(cores = control$local_cores), pkgs = c("survival", "Rcpp", "clustermq")
+    template = list(cores = control$local_cores), pkgs = c("survival", "Rcpp", "clustermq"),verbose=verbose
   )
   hr_se <- do.call(c, out)
   se <- sd(hr_se)

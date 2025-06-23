@@ -11,6 +11,9 @@
 
 \item{...}{Parameters for other methods.}
 }
+\value{
+No return value. This is called for its side effects.
+}
 \description{
 At the moment, only coxph is supported for the time-to-event endpoints.
 }

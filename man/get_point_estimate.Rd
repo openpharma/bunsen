@@ -12,7 +12,8 @@ get_point_estimate(
   M = 1000,
   seed = NULL,
   cpp = TRUE,
-  control = clmqControl()
+  control = clmqControl(),
+  verbose = TRUE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ get_point_estimate(
 \item{cpp}{Bool. True for using C++ optimization. False for not using C++ optimization. This requires cpp package installed.}
 
 \item{control}{Named list. A list containing control parameters, including memory of remote workers, whether to use nested parallel computation or local multiprocess, number of remote workers/jobs, etc. See details of \link[bunsen]{clmqControl}.}
+
+\item{verbose}{Bool. Print status messages. Default: TRUE}
 }
 \value{
 The marginal beta (logHR)
