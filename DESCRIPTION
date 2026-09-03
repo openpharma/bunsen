@@ -1,6 +1,6 @@
 Package: bunsen
 Title: Marginal Survival Estimation with Covariate Adjustment
-Version: 0.1.1
+Version: 0.1.0
 Authors@R: 
   c(person(given = "Xinlei", 
            family = "Deng", 
@@ -34,12 +34,10 @@ Description: Provides an efficient and robust implementation for estimating marg
   Restricted Mean Survival Time (RMST) with covariate adjustment using Daniel et al. (2021) <doi:10.1002/bimj.201900297> and 
   Karrison et al. (2018) <doi:10.1177/1740774518759281>.
 Maintainer: Xinlei Deng <xinlei.deng@novartis.com>
-BugReports:	https://github.com/openpharma/bunsen/issues
-URL: https://github.com/openpharma/bunsen
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.3
+RoxygenNote: 7.3.1
 Depends: 
     R (>= 2.10)
 LazyData: true

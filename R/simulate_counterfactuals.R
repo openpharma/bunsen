@@ -38,6 +38,7 @@
 #' bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
 simulate_counterfactuals <- function(bh, surv_cond, M, cpp, loadcpp = TRUE) {
   if (cpp) {
+    if (loadcpp) sourceCpp("./src/cpp_functions.cpp")
     newd <- rbinom_matrix_vec(nrows = nrow(bh), ncols = M, surv_cond)
     index_event_d <- firstZeroIndex(newd)
   } else {
