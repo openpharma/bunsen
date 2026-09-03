@@ -66,9 +66,11 @@ get_variance_estimation <- function(cox_event, cox_censor, trt, data, M, n.boot,
       calculate_trt_effect = calculate_trt_effect,
       simulate_counterfactuals = simulate_counterfactuals,
       clmqControl = clmqControl,
-      .fx_clsmq_simcoun = .fx_clsmq_simcoun
+      .fx_clsmq_simcoun = .fx_clsmq_simcoun,
+      firstZeroIndex=firstZeroIndex,
+      rbinom_matrix_vec=rbinom_matrix_vec
     ),
-    template = list(cores = control$local_cores), pkgs = c("survival", "Rcpp", "clustermq"),verbose=verbose
+    template = list(cores = control$local_cores), pkgs = c("survival", "Rcpp", "clustermq",'bunsen'),verbose=verbose
   )
   hr_se <- do.call(c, out)
   se <- sd(hr_se)

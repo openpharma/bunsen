@@ -8,6 +8,14 @@
 \description{
 Provides an efficient and robust implementation for estimating marginal Hazard Ratio (HR) and Restricted Mean Survival Time (RMST) with covariate adjustment using Daniel et al. (2021) \doi{10.1002/bimj.201900297} and Karrison et al. (2018) \doi{10.1177/1740774518759281}.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://openpharma.github.io/bunsen/}
+  \item Report bugs at \url{https://github.com/openpharma/bunsen/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Xinlei Deng \email{xinlei.deng@novartis.com} (\href{https://orcid.org/0000-0001-8129-6007}{ORCID})
 
