@@ -21,15 +21,15 @@ IntegerVector firstZeroIndex(NumericMatrix mat) {
 // [[Rcpp::export]]
 IntegerMatrix rbinom_matrix_vec(int nrows, int ncols, NumericVector probs) {
   RNGScope scope;
-  
+
   IntegerMatrix mat(nrows, ncols);
-  
+
   for (int j = 0; j < ncols; j++) {
     for (int i = 0; i < nrows; i++) {
       mat(i, j) = R::rbinom(1, probs[i]);
     }
   }
-  
+
   return mat;
 }
 
