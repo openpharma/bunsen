@@ -22,7 +22,7 @@
 #' after adjustment for different covariate sets.
 #' Biom J. 2021;63(3):528-557. doi:10.1002/bimj.201900297
 #' @export
-#' @importFrom Rcpp sourceCpp
+#' @import Rcpp
 #' @examples
 #' library(survival)
 #' data("oak")
@@ -38,7 +38,6 @@
 #' bh = bh, surv_cond = s_condi$surv_cond0, cpp = FALSE, M = 1000)
 simulate_counterfactuals <- function(bh, surv_cond, M, cpp, loadcpp = TRUE) {
   if (cpp) {
-    if (loadcpp) sourceCpp("./src/cpp_functions.cpp")
     newd <- rbinom_matrix_vec(nrows = nrow(bh), ncols = M, surv_cond)
     index_event_d <- firstZeroIndex(newd)
   } else {

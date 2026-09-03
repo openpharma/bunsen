@@ -28,7 +28,7 @@
 #' @export
 #' @importFrom survival basehaz
 #' @importFrom clustermq Q
-#' @importFrom Rcpp sourceCpp
+#' @import Rcpp
 #' @examples
 #' library(survival)
 #' data("oak")
@@ -80,7 +80,7 @@ get_point_estimate <- function(trt, cox_event, cox_censor, data, M = 1000, seed 
 
     output <- calculate_trt_effect(sim_out_1d = sim_dt[[1]], sim_out_0d = sim_dt[[2]], sim_out_1c = sim_dt[[3]], sim_out_0c = sim_dt[[4]])
   } else {
-    if (cpp) sourceCpp("./src/cpp_functions.cpp")
+    if (is.null(seed)) seed <- Sys.time()
     sim_out_1d <- simulate_counterfactuals(bh = bh, surv_cond = s1_condi, cpp = cpp, M = M, loadcpp = FALSE)
     sim_out_0d <- simulate_counterfactuals(bh = bh, surv_cond = s0_condi, cpp = cpp, M = M, loadcpp = FALSE)
     sim_out_1c <- simulate_counterfactuals(bh = bh_c, surv_cond = s1_condi_c, cpp = cpp, M = M, loadcpp = FALSE)
